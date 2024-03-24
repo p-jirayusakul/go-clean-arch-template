@@ -7,10 +7,10 @@ import (
 )
 
 type AddressesRepository interface {
-	CreateAddresses(ctx context.Context, p entities.AddressesDto) (string, error)
-	ListAddressesByAccountId(ctx context.Context, p string) ([]entities.Addresses, error)
-	GetAddressById(ctx context.Context, p string) (entities.Addresses, error)
-	UpdateAddressById(ctx context.Context, p entities.AddressesDto) error
-	DeleteAddressesById(ctx context.Context, p string) error
-	IsAddressesAlreadyExists(ctx context.Context, p entities.AddressesDto) (bool, error)
+	CreateAddresses(ctx context.Context, addresses entities.AddressesDto) (result string, err error)
+	ListAddressesByAccountId(ctx context.Context, accountsID string) (result []entities.Addresses, err error)
+	GetAddressById(ctx context.Context, addressesID string) (result entities.Addresses, err error)
+	UpdateAddressById(ctx context.Context, addresses entities.AddressesDto) (err error)
+	DeleteAddressesById(ctx context.Context, addressesID string) (err error)
+	IsAddressesAlreadyExists(ctx context.Context, addresses entities.AddressesDto) (result bool, err error)
 }

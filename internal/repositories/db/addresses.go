@@ -16,35 +16,34 @@ func NewAddressesRepository(db *database.Queries) AddressesRepository {
 	return AddressesRepository{db: db}
 }
 
-func (x *AddressesRepository) CreateAddresses(ctx context.Context, p entities.AddressesDto) (string, error) {
+func (x *AddressesRepository) CreateAddresses(ctx context.Context, addresses entities.AddressesDto) (result string, err error) {
 	params := database.CreateAddressesParams{
-		City:          p.City,
-		StateProvince: p.StateProvince,
-		PostalCode:    p.PostalCode,
-		Country:       p.Country,
-		AccountsID:    p.AccountsID,
+		City:          addresses.City,
+		StateProvince: addresses.StateProvince,
+		PostalCode:    addresses.PostalCode,
+		Country:       addresses.Country,
+		AccountsID:    addresses.AccountsID,
 	}
 
-	if p.StreetAddress != nil {
-		params.StreetAddress = pgtype.Text{String: *p.StreetAddress, Valid: true}
+	if addresses.StreetAddress != nil {
+		params.StreetAddress = pgtype.Text{String: *addresses.StreetAddress, Valid: true}
 	}
 
-	r, err := x.db.CreateAddresses(ctx, params)
+	result, err = x.db.CreateAddresses(ctx, params)
 	if err != nil {
-		return "", err
+		return
 	}
 
-	return r, nil
+	return
 }
 
-func (x *AddressesRepository) ListAddressesByAccountId(ctx context.Context, p string) ([]entities.Addresses, error) {
+func (x *AddressesRepository) ListAddressesByAccountId(ctx context.Context, accountsID string) (result []entities.Addresses, err error) {
 
-	r, err := x.db.ListAddressesByAccountId(ctx, p)
+	r, err := x.db.ListAddressesByAccountId(ctx, accountsID)
 	if err != nil {
-		return []entities.Addresses{}, err
+		return
 	}
 
-	result := []entities.Addresses{}
 	for _, data := range r {
 		arg := entities.Addresses{
 			ID:            data.ID,
@@ -65,17 +64,17 @@ func (x *AddressesRepository) ListAddressesByAccountId(ctx context.Context, p st
 		result = append(result, arg)
 	}
 
-	return result, nil
+	return
 }
 
-func (x *AddressesRepository) GetAddressById(ctx context.Context, p string) (entities.Addresses, error) {
+func (x *AddressesRepository) GetAddressById(ctx context.Context, addressesID string) (result entities.Addresses, err error) {
 
-	r, err := x.db.GetAddressById(ctx, p)
+	r, err := x.db.GetAddressById(ctx, addressesID)
 	if err != nil {
-		return entities.Addresses{}, err
+		return
 	}
 
-	result := entities.Addresses{
+	result = entities.Addresses{
 		ID:            r.ID,
 		City:          r.City,
 		StateProvince: r.StateProvince,
@@ -91,53 +90,53 @@ func (x *AddressesRepository) GetAddressById(ctx context.Context, p string) (ent
 		result.AccountsID = &r.AccountsID.String
 	}
 
-	return result, nil
+	return
 }
 
-func (x *AddressesRepository) UpdateAddressById(ctx context.Context, p entities.AddressesDto) error {
+func (x *AddressesRepository) UpdateAddressById(ctx context.Context, addresses entities.AddressesDto) (err error) {
 
 	params := database.UpdateAddressByIdParams{
-		ID:            p.ID,
-		City:          p.City,
-		StateProvince: p.StateProvince,
-		PostalCode:    p.PostalCode,
-		Country:       p.Country,
-		AccountsID:    p.AccountsID,
+		ID:            addresses.ID,
+		City:          addresses.City,
+		StateProvince: addresses.StateProvince,
+		PostalCode:    addresses.PostalCode,
+		Country:       addresses.Country,
+		AccountsID:    addresses.AccountsID,
 	}
 
-	if p.StreetAddress != nil {
-		params.StreetAddress = pgtype.Text{String: *p.StreetAddress, Valid: true}
+	if addresses.StreetAddress != nil {
+		params.StreetAddress = pgtype.Text{String: *addresses.StreetAddress, Valid: true}
 	}
 
-	err := x.db.UpdateAddressById(ctx, params)
+	err = x.db.UpdateAddressById(ctx, params)
 	if err != nil {
-		return err
+		return
 	}
 
-	return nil
+	return
 }
 
-func (x *AddressesRepository) DeleteAddressesById(ctx context.Context, p string) error {
+func (x *AddressesRepository) DeleteAddressesById(ctx context.Context, addressesID string) (err error) {
 
-	err := x.db.DeleteAddressesById(ctx, p)
+	err = x.db.DeleteAddressesById(ctx, addressesID)
 	if err != nil {
-		return err
+		return
 	}
 
-	return nil
+	return
 }
 
-func (x *AddressesRepository) IsAddressesAlreadyExists(ctx context.Context, p entities.AddressesDto) (bool, error) {
+func (x *AddressesRepository) IsAddressesAlreadyExists(ctx context.Context, addresses entities.AddressesDto) (result bool, err error) {
 
 	params := database.IsAddressesAlreadyExistsParams{
-		ID:         p.ID,
-		AccountsID: p.AccountsID,
+		ID:         addresses.ID,
+		AccountsID: addresses.AccountsID,
 	}
 
-	r, err := x.db.IsAddressesAlreadyExists(ctx, params)
+	result, err = x.db.IsAddressesAlreadyExists(ctx, params)
 	if err != nil {
-		return false, err
+		return
 	}
 
-	return r, nil
+	return
 }

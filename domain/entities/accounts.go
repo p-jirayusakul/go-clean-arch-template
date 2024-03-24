@@ -10,7 +10,3 @@ type AccountsDto struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
-
-type AccountsIdDto struct {
-	ID string `json:"id"`
-}

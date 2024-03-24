@@ -15,49 +15,49 @@ func NewAccountsRepository(db *database.Queries) AccountsRepository {
 	return AccountsRepository{db: db}
 }
 
-func (x *AccountsRepository) CraeteAccount(ctx context.Context, p entities.AccountsDto) (string, error) {
+func (x *AccountsRepository) CraeteAccount(ctx context.Context, account entities.AccountsDto) (result string, err error) {
 	params := database.CreateAccountParams{
-		Email:    p.Email,
-		Password: p.Password,
+		Email:    account.Email,
+		Password: account.Password,
 	}
 
-	r, err := x.db.CreateAccount(ctx, params)
+	result, err = x.db.CreateAccount(ctx, params)
 	if err != nil {
-		return "", err
+		return
 	}
 
-	return r, nil
+	return
 }
 
-func (x *AccountsRepository) IsEmailAlreadyExists(ctx context.Context, p string) (bool, error) {
-	r, err := x.db.IsEmailAlreadyExists(ctx, p)
+func (x *AccountsRepository) IsEmailAlreadyExists(ctx context.Context, email string) (result bool, err error) {
+	result, err = x.db.IsEmailAlreadyExists(ctx, email)
 	if err != nil {
-		return false, err
+		return
 	}
 
-	return r, nil
+	return
 }
 
-func (x *AccountsRepository) IsAccountAlreadyExists(ctx context.Context, p string) (bool, error) {
-	r, err := x.db.IsAccountAlreadyExists(ctx, p)
+func (x *AccountsRepository) IsAccountAlreadyExists(ctx context.Context, accountsID string) (result bool, err error) {
+	result, err = x.db.IsAccountAlreadyExists(ctx, accountsID)
 	if err != nil {
-		return false, err
+		return
 	}
 
-	return r, nil
+	return
 }
 
-func (x *AccountsRepository) GetAccountByEmail(ctx context.Context, p string) (entities.Accounts, error) {
-	r, err := x.db.GetAccountByEmail(ctx, p)
+func (x *AccountsRepository) GetAccountByEmail(ctx context.Context, email string) (result entities.Accounts, err error) {
+	r, err := x.db.GetAccountByEmail(ctx, email)
 	if err != nil {
-		return entities.Accounts{}, err
+		return
 	}
 
-	e := entities.Accounts{
+	result = entities.Accounts{
 		ID:       r.ID,
 		Email:    r.Email,
 		Password: r.Password,
 	}
 
-	return e, nil
+	return
 }

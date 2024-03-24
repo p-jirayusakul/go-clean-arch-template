@@ -7,8 +7,8 @@ import (
 )
 
 type AccountsRepository interface {
-	CraeteAccount(ctx context.Context, p entities.AccountsDto) (string, error)
-	IsEmailAlreadyExists(ctx context.Context, p string) (bool, error)
-	IsAccountAlreadyExists(ctx context.Context, p string) (bool, error)
-	GetAccountByEmail(ctx context.Context, p string) (entities.Accounts, error)
+	CraeteAccount(ctx context.Context, account entities.AccountsDto) (result string, err error)
+	IsEmailAlreadyExists(ctx context.Context, email string) (result bool, err error)
+	IsAccountAlreadyExists(ctx context.Context, accountsID string) (result bool, err error)
+	GetAccountByEmail(ctx context.Context, email string) (result entities.Accounts, err error)
 }

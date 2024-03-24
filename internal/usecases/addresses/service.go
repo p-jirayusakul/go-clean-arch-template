@@ -62,7 +62,7 @@ func (x *addressesInteractor) DeleteAddresses(arg entities.AddressesDto) (err er
 	})
 
 	if err != nil {
-		return err
+		return
 	}
 
 	if !isAlreadyExists {
