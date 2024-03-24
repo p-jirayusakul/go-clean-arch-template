@@ -7,4 +7,5 @@ import (
 type AccountsUsecase interface {
 	Register(arg entities.AccountsDto) (id string, err error)
 	Login(arg entities.AccountsDto) (token string, err error)
+	IsAccountAlreadyExists(arg string) (isAlreadyExists bool, err error)
 }

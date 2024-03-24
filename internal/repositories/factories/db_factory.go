@@ -7,15 +7,18 @@ import (
 )
 
 type DBFactory struct {
-	AccountsRepo repositories.AccountsRepository
+	AccountsRepo  repositories.AccountsRepository
+	AddressesRepo repositories.AddressesRepository
 }
 
 func NewDBFactory(db *database.Queries) *DBFactory {
 	var (
-		AccountsRepo = db_repositories.NewAccountsRepository(db)
+		AccountsRepo  = db_repositories.NewAccountsRepository(db)
+		AddressesRepo = db_repositories.NewAddressesRepository(db)
 	)
 
 	return &DBFactory{
-		AccountsRepo: &AccountsRepo,
+		AccountsRepo:  &AccountsRepo,
+		AddressesRepo: &AddressesRepo,
 	}
 }

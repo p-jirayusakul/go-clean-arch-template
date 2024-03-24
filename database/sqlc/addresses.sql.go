@@ -49,16 +49,17 @@ func (q *Queries) DeleteAddressesById(ctx context.Context, id string) error {
 }
 
 const getAddressById = `-- name: GetAddressById :one
-SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses WHERE id = $1 LIMIT 1
+SELECT id, street_address, city, state_province, postal_code, country, accounts_id FROM public.addresses WHERE id = $1 LIMIT 1
 `
 
 type GetAddressByIdRow struct {
 	ID            string      `json:"id"`
-	StreetAddress pgtype.Text `json:"streetAddress"`
+	StreetAddress pgtype.Text `json:"street_address"`
 	City          string      `json:"city"`
-	StateProvince string      `json:"stateProvince"`
-	PostalCode    string      `json:"postalCode"`
+	StateProvince string      `json:"state_province"`
+	PostalCode    string      `json:"postal_code"`
 	Country       string      `json:"country"`
+	AccountsID    pgtype.Text `json:"accounts_id"`
 }
 
 func (q *Queries) GetAddressById(ctx context.Context, id string) (GetAddressByIdRow, error) {
@@ -71,6 +72,7 @@ func (q *Queries) GetAddressById(ctx context.Context, id string) (GetAddressById
 		&i.StateProvince,
 		&i.PostalCode,
 		&i.Country,
+		&i.AccountsID,
 	)
 	return i, err
 }
@@ -95,16 +97,17 @@ func (q *Queries) IsAddressesAlreadyExists(ctx context.Context, arg IsAddressesA
 }
 
 const listAddresses = `-- name: ListAddresses :many
-SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses
+SELECT id, street_address, city, state_province, postal_code, country, accounts_id FROM public.addresses
 `
 
 type ListAddressesRow struct {
 	ID            string      `json:"id"`
-	StreetAddress pgtype.Text `json:"streetAddress"`
+	StreetAddress pgtype.Text `json:"street_address"`
 	City          string      `json:"city"`
-	StateProvince string      `json:"stateProvince"`
-	PostalCode    string      `json:"postalCode"`
+	StateProvince string      `json:"state_province"`
+	PostalCode    string      `json:"postal_code"`
 	Country       string      `json:"country"`
+	AccountsID    pgtype.Text `json:"accounts_id"`
 }
 
 func (q *Queries) ListAddresses(ctx context.Context) ([]ListAddressesRow, error) {
@@ -123,6 +126,7 @@ func (q *Queries) ListAddresses(ctx context.Context) ([]ListAddressesRow, error)
 			&i.StateProvince,
 			&i.PostalCode,
 			&i.Country,
+			&i.AccountsID,
 		); err != nil {
 			return nil, err
 		}
@@ -135,16 +139,17 @@ func (q *Queries) ListAddresses(ctx context.Context) ([]ListAddressesRow, error)
 }
 
 const listAddressesByAccountId = `-- name: ListAddressesByAccountId :many
-SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses WHERE accounts_id = $1::text
+SELECT id, street_address, city, state_province, postal_code, country, accounts_id FROM public.addresses WHERE accounts_id = $1::text
 `
 
 type ListAddressesByAccountIdRow struct {
 	ID            string      `json:"id"`
-	StreetAddress pgtype.Text `json:"streetAddress"`
+	StreetAddress pgtype.Text `json:"street_address"`
 	City          string      `json:"city"`
-	StateProvince string      `json:"stateProvince"`
-	PostalCode    string      `json:"postalCode"`
+	StateProvince string      `json:"state_province"`
+	PostalCode    string      `json:"postal_code"`
 	Country       string      `json:"country"`
+	AccountsID    pgtype.Text `json:"accounts_id"`
 }
 
 func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID string) ([]ListAddressesByAccountIdRow, error) {
@@ -163,6 +168,7 @@ func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID strin
 			&i.StateProvince,
 			&i.PostalCode,
 			&i.Country,
+			&i.AccountsID,
 		); err != nil {
 			return nil, err
 		}

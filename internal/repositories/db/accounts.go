@@ -38,6 +38,15 @@ func (x *AccountsRepository) IsEmailAlreadyExists(ctx context.Context, p string)
 	return r, nil
 }
 
+func (x *AccountsRepository) IsAccountAlreadyExists(ctx context.Context, p string) (bool, error) {
+	r, err := x.db.IsAccountAlreadyExists(ctx, p)
+	if err != nil {
+		return false, err
+	}
+
+	return r, nil
+}
+
 func (x *AccountsRepository) GetAccountByEmail(ctx context.Context, p string) (entities.Accounts, error) {
 	r, err := x.db.GetAccountByEmail(ctx, p)
 	if err != nil {

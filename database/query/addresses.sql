@@ -3,13 +3,13 @@ INSERT INTO public.addresses(street_address, city, state_province, postal_code, 
 VALUES ($1, $2, $3, $4, $5, sqlc.arg(accounts_id)::text) RETURNING id;
 
 -- name: ListAddresses :many
-SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses;
+SELECT id, street_address, city, state_province, postal_code, country, accounts_id FROM public.addresses;
 
 -- name: ListAddressesByAccountId :many
-SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses WHERE accounts_id = sqlc.arg(accounts_id)::text;
+SELECT id, street_address, city, state_province, postal_code, country, accounts_id FROM public.addresses WHERE accounts_id = sqlc.arg(accounts_id)::text;
 
 -- name: GetAddressById :one
-SELECT id, street_address as "streetAddress", city, state_province as "stateProvince", postal_code as "postalCode", country FROM public.addresses WHERE id = $1 LIMIT 1;
+SELECT id, street_address, city, state_province, postal_code, country, accounts_id FROM public.addresses WHERE id = $1 LIMIT 1;
 
 -- name: UpdateAddressById :exec
 UPDATE public.addresses

@@ -69,3 +69,17 @@ func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err 
 
 	return
 }
+
+func (x *accountsInteractor) IsAccountAlreadyExists(arg string) (isAlreadyExists bool, err error) {
+	ctx := context.Background()
+
+	isAlreadyExists, err = x.accountsRepo.IsAccountAlreadyExists(ctx, arg)
+	if err != nil {
+		if errors.Is(err, common.ErrDBNoRows) {
+			return false, common.ErrLoginFail
+		}
+		return
+	}
+
+	return
+}
