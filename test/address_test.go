@@ -25,20 +25,20 @@ func TestCreateAddress(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          string
-		buildStubs    func(dbFactory *mockup.MockDBFactory, body request.CreateAddressesRequest)
+		buildStubs    func(store *mockup.MockStore, body request.CreateAddressesRequest)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.CreateAddressesRequest) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
+			buildStubs: func(store *mockup.MockStore, body request.CreateAddressesRequest) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 				var streetAddress pgtype.Text
 				if body.Address != nil {
 					streetAddress.String = *body.Address
 					streetAddress.Valid = true
 				}
-				dbFactory.EXPECT().CreateAddresses(gomock.Any(), database.CreateAddressesParams{
+				store.EXPECT().CreateAddresses(gomock.Any(), database.CreateAddressesParams{
 					StreetAddress: streetAddress,
 					City:          body.City,
 					StateProvince: body.Province,
@@ -55,8 +55,8 @@ func TestCreateAddress(t *testing.T) {
 		{
 			name: "unauthorized - accounts id is invalid",
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.CreateAddressesRequest) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
+			buildStubs: func(store *mockup.MockStore, body request.CreateAddressesRequest) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -66,7 +66,7 @@ func TestCreateAddress(t *testing.T) {
 		{
 			name: "Bad Request - city is required",
 			body: `{"address":"address","province":"province","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.CreateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.CreateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -76,7 +76,7 @@ func TestCreateAddress(t *testing.T) {
 		{
 			name: "Bad Request - province is required",
 			body: `{"address":"address","city":"city","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.CreateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.CreateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -86,7 +86,7 @@ func TestCreateAddress(t *testing.T) {
 		{
 			name: "Bad Request - postalCode is required",
 			body: `{"address":"address","city":"city","province":"province","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.CreateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.CreateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -96,7 +96,7 @@ func TestCreateAddress(t *testing.T) {
 		{
 			name: "Bad Request - country is required",
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.CreateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.CreateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -117,7 +117,7 @@ func TestCreateAddress(t *testing.T) {
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
 
-			dbFactory := mockup.NewMockDBFactory(ctrl)
+			dbFactory := mockup.NewMockStore(ctrl)
 			tc.buildStubs(dbFactory, dto)
 
 			app := echo.New()
@@ -140,15 +140,15 @@ func TestCreateAddress(t *testing.T) {
 func TestListAddresses(t *testing.T) {
 	testCases := []struct {
 		name          string
-		buildStubs    func(dbFactory *mockup.MockDBFactory)
+		buildStubs    func(store *mockup.MockStore)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
-			buildStubs: func(dbFactory *mockup.MockDBFactory) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
+			buildStubs: func(store *mockup.MockStore) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				dbFactory.EXPECT().ListAddressesByAccountId(gomock.Any(), uid).Times(1).Return([]database.ListAddressesByAccountIdRow{
+				store.EXPECT().ListAddressesByAccountId(gomock.Any(), uid).Times(1).Return([]database.ListAddressesByAccountIdRow{
 					{
 						ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
 						StreetAddress: pgtype.Text{String: "address", Valid: true},
@@ -166,8 +166,8 @@ func TestListAddresses(t *testing.T) {
 		},
 		{
 			name: "unauthorized - accounts id is invalid",
-			buildStubs: func(dbFactory *mockup.MockDBFactory) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
+			buildStubs: func(store *mockup.MockStore) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -184,7 +184,7 @@ func TestListAddresses(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			dbFactory := mockup.NewMockDBFactory(ctrl)
+			dbFactory := mockup.NewMockStore(ctrl)
 			tc.buildStubs(dbFactory)
 
 			app := echo.New()
@@ -209,16 +209,16 @@ func TestUpdateAddresses(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          string
-		buildStubs    func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest)
+		buildStubs    func(store *mockup.MockStore, body request.UpdateAddressesRequest)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
+			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				dbFactory.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(true, nil)
@@ -228,7 +228,7 @@ func TestUpdateAddresses(t *testing.T) {
 					streetAddress.String = *body.Address
 					streetAddress.Valid = true
 				}
-				dbFactory.EXPECT().UpdateAddressById(gomock.Any(), database.UpdateAddressByIdParams{
+				store.EXPECT().UpdateAddressById(gomock.Any(), database.UpdateAddressByIdParams{
 					ID:            addressesID,
 					StreetAddress: streetAddress,
 					City:          body.City,
@@ -246,10 +246,10 @@ func TestUpdateAddresses(t *testing.T) {
 		{
 			name: "Not found - address id not found",
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
+			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				dbFactory.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(false, nil)
@@ -262,8 +262,8 @@ func TestUpdateAddresses(t *testing.T) {
 		{
 			name: "unauthorized - accounts id is invalid",
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
+			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -273,7 +273,7 @@ func TestUpdateAddresses(t *testing.T) {
 		{
 			name: "Bad Request - city is required",
 			body: `{"address":"address","province":"province","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -283,7 +283,7 @@ func TestUpdateAddresses(t *testing.T) {
 		{
 			name: "Bad Request - province is required",
 			body: `{"address":"address","city":"city","postalCode":"postalCode","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -293,7 +293,7 @@ func TestUpdateAddresses(t *testing.T) {
 		{
 			name: "Bad Request - postalCode is required",
 			body: `{"address":"address","city":"city","province":"province","country":"country"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -303,7 +303,7 @@ func TestUpdateAddresses(t *testing.T) {
 		{
 			name: "Bad Request - country is required",
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.UpdateAddressesRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -324,7 +324,7 @@ func TestUpdateAddresses(t *testing.T) {
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
 
-			dbFactory := mockup.NewMockDBFactory(ctrl)
+			dbFactory := mockup.NewMockStore(ctrl)
 			tc.buildStubs(dbFactory, dto)
 
 			app := echo.New()
@@ -351,19 +351,19 @@ func TestDeleteAddresses(t *testing.T) {
 	addressesID := "e2109e75-1d9d-48fb-9e68-310d4720b015"
 	testCases := []struct {
 		name          string
-		buildStubs    func(dbFactory *mockup.MockDBFactory)
+		buildStubs    func(store *mockup.MockStore)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
-			buildStubs: func(dbFactory *mockup.MockDBFactory) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
+			buildStubs: func(store *mockup.MockStore) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				dbFactory.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(true, nil)
-				dbFactory.EXPECT().DeleteAddressesById(gomock.Any(), addressesID).Times(1).Return(nil)
+				store.EXPECT().DeleteAddressesById(gomock.Any(), addressesID).Times(1).Return(nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.NoError(t, err)
@@ -372,10 +372,10 @@ func TestDeleteAddresses(t *testing.T) {
 		},
 		{
 			name: "Not found - address id not found",
-			buildStubs: func(dbFactory *mockup.MockDBFactory) {
-				dbFactory.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
+			buildStubs: func(store *mockup.MockStore) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				dbFactory.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(false, nil)
@@ -395,7 +395,7 @@ func TestDeleteAddresses(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			dbFactory := mockup.NewMockDBFactory(ctrl)
+			dbFactory := mockup.NewMockStore(ctrl)
 			tc.buildStubs(dbFactory)
 
 			app := echo.New()

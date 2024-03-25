@@ -30,15 +30,15 @@ func TestRegister(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          string
-		buildStubs    func(dbFactory *mockup.MockDBFactory, body request.RegisterRequest)
+		buildStubs    func(store *mockup.MockStore, body request.RegisterRequest)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.RegisterRequest) {
-				dbFactory.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(false, nil)
-				dbFactory.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(1).Return(uid, nil)
+			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
+				store.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(false, nil)
+				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(1).Return(uid, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.NoError(t, err)
@@ -48,8 +48,8 @@ func TestRegister(t *testing.T) {
 		{
 			name: "Bad Request - this email is already used",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.RegisterRequest) {
-				dbFactory.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(true, nil)
+			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
+				store.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(true, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -59,7 +59,7 @@ func TestRegister(t *testing.T) {
 		{
 			name: "Bad Request - email invalid format",
 			body: `{"email":"testemail.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.RegisterRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -69,9 +69,9 @@ func TestRegister(t *testing.T) {
 		{
 			name: "Internal Server Error",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.RegisterRequest) {
-				dbFactory.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(false, nil)
-				dbFactory.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(1).Return("", pgx.ErrTxClosed)
+			buildStubs: func(store *mockup.MockStore, body request.RegisterRequest) {
+				store.EXPECT().IsEmailAlreadyExists(gomock.Any(), body.Email).Times(1).Return(false, nil)
+				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(1).Return("", pgx.ErrTxClosed)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -92,7 +92,7 @@ func TestRegister(t *testing.T) {
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
 
-			dbFactory := mockup.NewMockDBFactory(ctrl)
+			dbFactory := mockup.NewMockStore(ctrl)
 			tc.buildStubs(dbFactory, dto)
 
 			app := echo.New()
@@ -117,14 +117,14 @@ func TestLogin(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          string
-		buildStubs    func(dbFactory *mockup.MockDBFactory, body request.LoginRequest)
+		buildStubs    func(store *mockup.MockStore, body request.LoginRequest)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.LoginRequest) {
-				dbFactory.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{
+			buildStubs: func(store *mockup.MockStore, body request.LoginRequest) {
+				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{
 					ID:       uid,
 					Email:    body.Email,
 					Password: hashedPassword,
@@ -138,8 +138,8 @@ func TestLogin(t *testing.T) {
 		{
 			name: "Unauthorized - username invalid",
 			body: `{"email":"test9999@email.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.LoginRequest) {
-				dbFactory.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{}, pgx.ErrNoRows)
+			buildStubs: func(store *mockup.MockStore, body request.LoginRequest) {
+				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{}, pgx.ErrNoRows)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -149,8 +149,8 @@ func TestLogin(t *testing.T) {
 		{
 			name: "Unauthorized - password invalid",
 			body: `{"email":"test@email.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.LoginRequest) {
-				dbFactory.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{
+			buildStubs: func(store *mockup.MockStore, body request.LoginRequest) {
+				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{
 					ID:       uid,
 					Email:    body.Email,
 					Password: "password invalid",
@@ -164,7 +164,7 @@ func TestLogin(t *testing.T) {
 		{
 			name: "Bad Request - email invalid format",
 			body: `{"email":"testemail.com","password":"123456"}`,
-			buildStubs: func(dbFactory *mockup.MockDBFactory, body request.LoginRequest) {
+			buildStubs: func(store *mockup.MockStore, body request.LoginRequest) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -185,7 +185,7 @@ func TestLogin(t *testing.T) {
 			err := json.Unmarshal([]byte(tc.body), &dto)
 			require.NoError(t, err)
 
-			dbFactory := mockup.NewMockDBFactory(ctrl)
+			dbFactory := mockup.NewMockStore(ctrl)
 			tc.buildStubs(dbFactory, dto)
 
 			app := echo.New()

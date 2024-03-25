@@ -6,17 +6,17 @@ import (
 )
 
 type accountsInteractor struct {
-	cfg       *config.Config
-	dbFactory factories.DBFactory
+	cfg   *config.Config
+	store factories.Store
 }
 
 func NewAccountsInteractor(
 	config *config.Config,
-	dbFactory factories.DBFactory,
+	store factories.Store,
 ) *accountsInteractor {
 
 	return &accountsInteractor{
-		cfg:       config,
-		dbFactory: dbFactory,
+		cfg:   config,
+		store: store,
 	}
 }

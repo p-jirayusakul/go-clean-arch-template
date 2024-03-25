@@ -24,7 +24,7 @@ func (x *addressesInteractor) CreateAddresses(addresses entities.AddressesDto) (
 		params.StreetAddress.Valid = true
 	}
 
-	id, err = x.dbFactory.CreateAddresses(ctx, params)
+	id, err = x.store.CreateAddresses(ctx, params)
 	if err != nil {
 		return
 	}
@@ -35,7 +35,7 @@ func (x *addressesInteractor) CreateAddresses(addresses entities.AddressesDto) (
 func (x *addressesInteractor) ListAddressesAddresses(addressesID string) (result []entities.Addresses, err error) {
 	ctx := context.Background()
 
-	r, err := x.dbFactory.ListAddressesByAccountId(ctx, addressesID)
+	r, err := x.store.ListAddressesByAccountId(ctx, addressesID)
 	if err != nil {
 		return
 	}
@@ -66,7 +66,7 @@ func (x *addressesInteractor) ListAddressesAddresses(addressesID string) (result
 func (x *addressesInteractor) UpdateAddresses(addresses entities.AddressesDto) (err error) {
 	ctx := context.Background()
 
-	isAlreadyExists, err := x.dbFactory.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+	isAlreadyExists, err := x.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
 		ID:         addresses.ID,
 		AccountsID: addresses.AccountsID,
 	})
@@ -93,7 +93,7 @@ func (x *addressesInteractor) UpdateAddresses(addresses entities.AddressesDto) (
 		params.StreetAddress.Valid = true
 	}
 
-	err = x.dbFactory.UpdateAddressById(ctx, params)
+	err = x.store.UpdateAddressById(ctx, params)
 	if err != nil {
 		return
 	}
@@ -104,7 +104,7 @@ func (x *addressesInteractor) UpdateAddresses(addresses entities.AddressesDto) (
 func (x *addressesInteractor) DeleteAddresses(addresses entities.AddressesDto) (err error) {
 	ctx := context.Background()
 
-	isAlreadyExists, err := x.dbFactory.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+	isAlreadyExists, err := x.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
 		ID:         addresses.ID,
 		AccountsID: addresses.AccountsID,
 	})
@@ -117,7 +117,7 @@ func (x *addressesInteractor) DeleteAddresses(addresses entities.AddressesDto) (
 		return common.ErrDataNotFound
 	}
 
-	err = x.dbFactory.DeleteAddressesById(ctx, addresses.ID)
+	err = x.store.DeleteAddressesById(ctx, addresses.ID)
 	if err != nil {
 		return
 	}

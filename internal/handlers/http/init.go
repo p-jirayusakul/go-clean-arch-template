@@ -22,18 +22,18 @@ type ServerHttpHandler struct {
 func NewServerHttpHandler(
 	app *echo.Echo,
 	cfg *config.Config,
-	dbFactory factories.DBFactory,
+	store factories.Store,
 
 ) *ServerHttpHandler {
 	handler := &ServerHttpHandler{
 		Cfg: cfg,
 		AccountsUsecase: accounts.NewAccountsInteractor(
 			cfg,
-			dbFactory,
+			store,
 		),
 		AddressesUsecase: addresses.NewaddressesInteractor(
 			cfg,
-			dbFactory,
+			store,
 		),
 	}
 

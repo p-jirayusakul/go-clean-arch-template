@@ -11,7 +11,7 @@ import (
 )
 
 // Store defines all functions to execute db queries and transactions
-type DBFactory interface {
+type Store interface {
 	database.Querier
 }
 
@@ -21,8 +21,8 @@ type SQLStore struct {
 	*database.Queries
 }
 
-// NewDBFactory creates a new store
-func NewDBFactory(connPool *pgxpool.Pool) DBFactory {
+// NewStore creates a new store
+func NewStore(connPool *pgxpool.Pool) Store {
 	return &SQLStore{
 		connPool: connPool,
 		Queries:  database.New(connPool),

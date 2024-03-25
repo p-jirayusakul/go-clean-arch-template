@@ -15,7 +15,7 @@ import (
 func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err error) {
 	ctx := context.Background()
 
-	isEmailAlready, err := x.dbFactory.IsEmailAlreadyExists(ctx, arg.Email)
+	isEmailAlready, err := x.store.IsEmailAlreadyExists(ctx, arg.Email)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 		Password: hashedPassword,
 	}
 
-	id, err = x.dbFactory.CreateAccount(ctx, params)
+	id, err = x.store.CreateAccount(ctx, params)
 	if err != nil {
 		return
 	}
@@ -45,7 +45,7 @@ func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err error) {
 	ctx := context.Background()
 
-	account, err := x.dbFactory.GetAccountByEmail(ctx, arg.Email)
+	account, err := x.store.GetAccountByEmail(ctx, arg.Email)
 	if err != nil {
 		if errors.Is(err, common.ErrDBNoRows) {
 			return "", common.ErrLoginFail
@@ -74,7 +74,7 @@ func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err 
 func (x *accountsInteractor) IsAccountAlreadyExists(arg string) (isAlreadyExists bool, err error) {
 	ctx := context.Background()
 
-	isAlreadyExists, err = x.dbFactory.IsAccountAlreadyExists(ctx, arg)
+	isAlreadyExists, err = x.store.IsAccountAlreadyExists(ctx, arg)
 	if err != nil {
 		return
 	}

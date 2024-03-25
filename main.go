@@ -32,7 +32,7 @@ var (
 func main() {
 
 	// plug database
-	dbFactory := factories.NewDBFactory(db)
+	store := factories.NewStore(db)
 
 	// plug controller
 	app := echo.New()
@@ -49,7 +49,7 @@ func main() {
 	app.Use(middleware.LogHandler(logger))
 
 	// add all plug to handler
-	handlers.NewServerHttpHandler(app, &cfg, dbFactory)
+	handlers.NewServerHttpHandler(app, &cfg, store)
 
 	app.Logger.Fatal(app.Start(":" + cfg.API_PORT))
 }
