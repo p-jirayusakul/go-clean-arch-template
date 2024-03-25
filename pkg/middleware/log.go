@@ -3,9 +3,11 @@ package middleware
 import (
 	"context"
 	"log/slog"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 )
 
 func LogHandler(logger *slog.Logger) echo.MiddlewareFunc {
@@ -20,6 +22,15 @@ func LogHandler(logger *slog.Logger) echo.MiddlewareFunc {
 		LogError:         true,
 		LogLatency:       true,
 		LogContentLength: true,
+		Skipper: func(c echo.Context) bool {
+			// Skip middleware if path is equal health check
+			if c.Request().URL.Path == "/" || c.Request().URL.Path == "" {
+				return true
+			} else if strings.Contains(c.Request().URL.Path, common.DOCS_URL) {
+				return true
+			}
+			return false
+		},
 		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 			var errMsg string
 			var logLevel slog.Level

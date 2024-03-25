@@ -41,17 +41,15 @@ func NewServerHttpHandler(
 		),
 	}
 
-	var baseAPI = "/api/v1"
-
-	app.GET(baseAPI+"/docs/*", echoSwagger.WrapHandler)
+	app.GET(common.DOCS_URL+"/*", echoSwagger.WrapHandler)
 
 	// auth
-	authGroup := app.Group(baseAPI + "/auth")
+	authGroup := app.Group(common.BASE_URL + "/auth")
 	authGroup.POST("/register", handler.Register)
 	authGroup.POST("/login", handler.Login)
 
 	// profile
-	addressesGroup := app.Group(baseAPI + "/profile")
+	addressesGroup := app.Group(common.BASE_URL + "/profile")
 	addressesGroup.Use(middleware.ConfigJWT(cfg.JWT_SECRET))
 	addressesGroup.POST("/addresses", handler.CreateAddresses)
 	addressesGroup.GET("/addresses", handler.ListAddresses)

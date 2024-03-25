@@ -367,7 +367,7 @@ func TestDeleteAddresses(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.NoError(t, err)
-				require.Equal(t, http.StatusNoContent, status)
+				require.Equal(t, http.StatusOK, status)
 			},
 		},
 		{

@@ -162,7 +162,7 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 // @Accept       json
 // @Produce      json
 // @Param        address_id   path      string  true  "Address ID"
-// @Success      204
+// @Success      200  {object}  utils.SuccessResponse
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
@@ -205,5 +205,5 @@ func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 	// Response
 	var payload interface{}
 	message := "deleted addresses completed"
-	return utils.RespondWithJSON(c, http.StatusNoContent, message, payload)
+	return utils.RespondWithJSON(c, http.StatusOK, message, payload)
 }
