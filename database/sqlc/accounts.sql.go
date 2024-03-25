@@ -19,7 +19,7 @@ type CreateAccountParams struct {
 	Password string `json:"password"`
 }
 
-func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (string, error) {
+func (q *Queries) CreateAccount(ctx context.Context, arg *CreateAccountParams) (string, error) {
 	row := q.db.QueryRow(ctx, createAccount, arg.Email, arg.Password)
 	var id string
 	err := row.Scan(&id)
@@ -45,11 +45,11 @@ type GetAccountByEmailRow struct {
 	Password string `json:"password"`
 }
 
-func (q *Queries) GetAccountByEmail(ctx context.Context, email string) (GetAccountByEmailRow, error) {
+func (q *Queries) GetAccountByEmail(ctx context.Context, email string) (*GetAccountByEmailRow, error) {
 	row := q.db.QueryRow(ctx, getAccountByEmail, email)
 	var i GetAccountByEmailRow
 	err := row.Scan(&i.ID, &i.Email, &i.Password)
-	return i, err
+	return &i, err
 }
 
 const getAccountByID = `-- name: GetAccountByID :one
@@ -62,11 +62,11 @@ type GetAccountByIDRow struct {
 	Password string `json:"password"`
 }
 
-func (q *Queries) GetAccountByID(ctx context.Context, id string) (GetAccountByIDRow, error) {
+func (q *Queries) GetAccountByID(ctx context.Context, id string) (*GetAccountByIDRow, error) {
 	row := q.db.QueryRow(ctx, getAccountByID, id)
 	var i GetAccountByIDRow
 	err := row.Scan(&i.ID, &i.Email, &i.Password)
-	return i, err
+	return &i, err
 }
 
 const isAccountAlreadyExists = `-- name: IsAccountAlreadyExists :one
@@ -107,19 +107,19 @@ type ListAccountsRow struct {
 	Password string `json:"password"`
 }
 
-func (q *Queries) ListAccounts(ctx context.Context) ([]ListAccountsRow, error) {
+func (q *Queries) ListAccounts(ctx context.Context) ([]*ListAccountsRow, error) {
 	rows, err := q.db.Query(ctx, listAccounts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []ListAccountsRow{}
+	items := []*ListAccountsRow{}
 	for rows.Next() {
 		var i ListAccountsRow
 		if err := rows.Scan(&i.ID, &i.Email, &i.Password); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, &i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -136,7 +136,7 @@ type UpdateAccountPasswordByEmailParams struct {
 	Password string `json:"password"`
 }
 
-func (q *Queries) UpdateAccountPasswordByEmail(ctx context.Context, arg UpdateAccountPasswordByEmailParams) error {
+func (q *Queries) UpdateAccountPasswordByEmail(ctx context.Context, arg *UpdateAccountPasswordByEmailParams) error {
 	_, err := q.db.Exec(ctx, updateAccountPasswordByEmail, arg.Email, arg.Password)
 	return err
 }

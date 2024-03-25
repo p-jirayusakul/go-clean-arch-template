@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	handlers "github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http"
@@ -33,13 +32,8 @@ func TestCreateAddress(t *testing.T) {
 			body: `{"address":"address","city":"city","province":"province","postalCode":"postalCode","country":"country"}`,
 			buildStubs: func(store *mockup.MockStore, body request.CreateAddressesRequest) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
-				var streetAddress pgtype.Text
-				if body.Address != nil {
-					streetAddress.String = *body.Address
-					streetAddress.Valid = true
-				}
-				store.EXPECT().CreateAddresses(gomock.Any(), database.CreateAddressesParams{
-					StreetAddress: streetAddress,
+				store.EXPECT().CreateAddresses(gomock.Any(), &database.CreateAddressesParams{
+					StreetAddress: body.Address,
 					City:          body.City,
 					StateProvince: body.Province,
 					PostalCode:    body.PostalCode,
@@ -148,10 +142,13 @@ func TestListAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().ListAddressesByAccountId(gomock.Any(), uid).Times(1).Return([]database.ListAddressesByAccountIdRow{
+				var streetAddress *string
+				tmp := "addresses"
+				streetAddress = &tmp
+				store.EXPECT().ListAddressesByAccountId(gomock.Any(), uid).Times(1).Return([]*database.ListAddressesByAccountIdRow{
 					{
 						ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
-						StreetAddress: pgtype.Text{String: "address", Valid: true},
+						StreetAddress: streetAddress,
 						City:          "city",
 						StateProvince: "provice",
 						PostalCode:    "pastalCode",
@@ -218,19 +215,14 @@ func TestUpdateAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), &database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(true, nil)
 
-				var streetAddress pgtype.Text
-				if body.Address != nil {
-					streetAddress.String = *body.Address
-					streetAddress.Valid = true
-				}
-				store.EXPECT().UpdateAddressById(gomock.Any(), database.UpdateAddressByIdParams{
+				store.EXPECT().UpdateAddressById(gomock.Any(), &database.UpdateAddressByIdParams{
 					ID:            addressesID,
-					StreetAddress: streetAddress,
+					StreetAddress: body.Address,
 					City:          body.City,
 					StateProvince: body.Province,
 					PostalCode:    body.PostalCode,
@@ -249,7 +241,7 @@ func TestUpdateAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore, body request.UpdateAddressesRequest) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), &database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(false, nil)
@@ -359,7 +351,7 @@ func TestDeleteAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), &database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(true, nil)
@@ -375,7 +367,7 @@ func TestDeleteAddresses(t *testing.T) {
 			buildStubs: func(store *mockup.MockStore) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
-				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), database.IsAddressesAlreadyExistsParams{
+				store.EXPECT().IsAddressesAlreadyExists(gomock.Any(), &database.IsAddressesAlreadyExistsParams{
 					ID:         addressesID,
 					AccountsID: uid,
 				}).Times(1).Return(false, nil)

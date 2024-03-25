@@ -41,7 +41,7 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 }
 
 // CreateAccount mocks base method.
-func (m *MockStore) CreateAccount(arg0 context.Context, arg1 database.CreateAccountParams) (string, error) {
+func (m *MockStore) CreateAccount(arg0 context.Context, arg1 *database.CreateAccountParams) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateAccount", arg0, arg1)
 	ret0, _ := ret[0].(string)
@@ -56,7 +56,7 @@ func (mr *MockStoreMockRecorder) CreateAccount(arg0, arg1 any) *gomock.Call {
 }
 
 // CreateAddresses mocks base method.
-func (m *MockStore) CreateAddresses(arg0 context.Context, arg1 database.CreateAddressesParams) (string, error) {
+func (m *MockStore) CreateAddresses(arg0 context.Context, arg1 *database.CreateAddressesParams) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateAddresses", arg0, arg1)
 	ret0, _ := ret[0].(string)
@@ -99,10 +99,10 @@ func (mr *MockStoreMockRecorder) DeleteAddressesById(arg0, arg1 any) *gomock.Cal
 }
 
 // GetAccountByEmail mocks base method.
-func (m *MockStore) GetAccountByEmail(arg0 context.Context, arg1 string) (database.GetAccountByEmailRow, error) {
+func (m *MockStore) GetAccountByEmail(arg0 context.Context, arg1 string) (*database.GetAccountByEmailRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAccountByEmail", arg0, arg1)
-	ret0, _ := ret[0].(database.GetAccountByEmailRow)
+	ret0, _ := ret[0].(*database.GetAccountByEmailRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -114,10 +114,10 @@ func (mr *MockStoreMockRecorder) GetAccountByEmail(arg0, arg1 any) *gomock.Call 
 }
 
 // GetAccountByID mocks base method.
-func (m *MockStore) GetAccountByID(arg0 context.Context, arg1 string) (database.GetAccountByIDRow, error) {
+func (m *MockStore) GetAccountByID(arg0 context.Context, arg1 string) (*database.GetAccountByIDRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAccountByID", arg0, arg1)
-	ret0, _ := ret[0].(database.GetAccountByIDRow)
+	ret0, _ := ret[0].(*database.GetAccountByIDRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -129,10 +129,10 @@ func (mr *MockStoreMockRecorder) GetAccountByID(arg0, arg1 any) *gomock.Call {
 }
 
 // GetAddressById mocks base method.
-func (m *MockStore) GetAddressById(arg0 context.Context, arg1 string) (database.GetAddressByIdRow, error) {
+func (m *MockStore) GetAddressById(arg0 context.Context, arg1 string) (*database.GetAddressByIdRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAddressById", arg0, arg1)
-	ret0, _ := ret[0].(database.GetAddressByIdRow)
+	ret0, _ := ret[0].(*database.GetAddressByIdRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -159,7 +159,7 @@ func (mr *MockStoreMockRecorder) IsAccountAlreadyExists(arg0, arg1 any) *gomock.
 }
 
 // IsAddressesAlreadyExists mocks base method.
-func (m *MockStore) IsAddressesAlreadyExists(arg0 context.Context, arg1 database.IsAddressesAlreadyExistsParams) (bool, error) {
+func (m *MockStore) IsAddressesAlreadyExists(arg0 context.Context, arg1 *database.IsAddressesAlreadyExistsParams) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsAddressesAlreadyExists", arg0, arg1)
 	ret0, _ := ret[0].(bool)
@@ -189,10 +189,10 @@ func (mr *MockStoreMockRecorder) IsEmailAlreadyExists(arg0, arg1 any) *gomock.Ca
 }
 
 // ListAccounts mocks base method.
-func (m *MockStore) ListAccounts(arg0 context.Context) ([]database.ListAccountsRow, error) {
+func (m *MockStore) ListAccounts(arg0 context.Context) ([]*database.ListAccountsRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAccounts", arg0)
-	ret0, _ := ret[0].([]database.ListAccountsRow)
+	ret0, _ := ret[0].([]*database.ListAccountsRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -204,10 +204,10 @@ func (mr *MockStoreMockRecorder) ListAccounts(arg0 any) *gomock.Call {
 }
 
 // ListAddresses mocks base method.
-func (m *MockStore) ListAddresses(arg0 context.Context) ([]database.ListAddressesRow, error) {
+func (m *MockStore) ListAddresses(arg0 context.Context) ([]*database.ListAddressesRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAddresses", arg0)
-	ret0, _ := ret[0].([]database.ListAddressesRow)
+	ret0, _ := ret[0].([]*database.ListAddressesRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -219,10 +219,10 @@ func (mr *MockStoreMockRecorder) ListAddresses(arg0 any) *gomock.Call {
 }
 
 // ListAddressesByAccountId mocks base method.
-func (m *MockStore) ListAddressesByAccountId(arg0 context.Context, arg1 string) ([]database.ListAddressesByAccountIdRow, error) {
+func (m *MockStore) ListAddressesByAccountId(arg0 context.Context, arg1 string) ([]*database.ListAddressesByAccountIdRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAddressesByAccountId", arg0, arg1)
-	ret0, _ := ret[0].([]database.ListAddressesByAccountIdRow)
+	ret0, _ := ret[0].([]*database.ListAddressesByAccountIdRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -234,7 +234,7 @@ func (mr *MockStoreMockRecorder) ListAddressesByAccountId(arg0, arg1 any) *gomoc
 }
 
 // UpdateAccountPasswordByEmail mocks base method.
-func (m *MockStore) UpdateAccountPasswordByEmail(arg0 context.Context, arg1 database.UpdateAccountPasswordByEmailParams) error {
+func (m *MockStore) UpdateAccountPasswordByEmail(arg0 context.Context, arg1 *database.UpdateAccountPasswordByEmailParams) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateAccountPasswordByEmail", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -248,7 +248,7 @@ func (mr *MockStoreMockRecorder) UpdateAccountPasswordByEmail(arg0, arg1 any) *g
 }
 
 // UpdateAddressById mocks base method.
-func (m *MockStore) UpdateAddressById(arg0 context.Context, arg1 database.UpdateAddressByIdParams) error {
+func (m *MockStore) UpdateAddressById(arg0 context.Context, arg1 *database.UpdateAddressByIdParams) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateAddressById", arg0, arg1)
 	ret0, _ := ret[0].(error)

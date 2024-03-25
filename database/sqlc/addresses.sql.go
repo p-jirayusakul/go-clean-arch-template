@@ -7,8 +7,6 @@ package database
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createAddresses = `-- name: CreateAddresses :one
@@ -17,15 +15,15 @@ VALUES ($1, $2, $3, $4, $5, $6::text) RETURNING id
 `
 
 type CreateAddressesParams struct {
-	StreetAddress pgtype.Text `json:"street_address"`
-	City          string      `json:"city"`
-	StateProvince string      `json:"state_province"`
-	PostalCode    string      `json:"postal_code"`
-	Country       string      `json:"country"`
-	AccountsID    string      `json:"accounts_id"`
+	StreetAddress *string `json:"street_address"`
+	City          string  `json:"city"`
+	StateProvince string  `json:"state_province"`
+	PostalCode    string  `json:"postal_code"`
+	Country       string  `json:"country"`
+	AccountsID    string  `json:"accounts_id"`
 }
 
-func (q *Queries) CreateAddresses(ctx context.Context, arg CreateAddressesParams) (string, error) {
+func (q *Queries) CreateAddresses(ctx context.Context, arg *CreateAddressesParams) (string, error) {
 	row := q.db.QueryRow(ctx, createAddresses,
 		arg.StreetAddress,
 		arg.City,
@@ -53,16 +51,16 @@ SELECT id, street_address, city, state_province, postal_code, country, accounts_
 `
 
 type GetAddressByIdRow struct {
-	ID            string      `json:"id"`
-	StreetAddress pgtype.Text `json:"street_address"`
-	City          string      `json:"city"`
-	StateProvince string      `json:"state_province"`
-	PostalCode    string      `json:"postal_code"`
-	Country       string      `json:"country"`
-	AccountsID    pgtype.Text `json:"accounts_id"`
+	ID            string  `json:"id"`
+	StreetAddress *string `json:"street_address"`
+	City          string  `json:"city"`
+	StateProvince string  `json:"state_province"`
+	PostalCode    string  `json:"postal_code"`
+	Country       string  `json:"country"`
+	AccountsID    *string `json:"accounts_id"`
 }
 
-func (q *Queries) GetAddressById(ctx context.Context, id string) (GetAddressByIdRow, error) {
+func (q *Queries) GetAddressById(ctx context.Context, id string) (*GetAddressByIdRow, error) {
 	row := q.db.QueryRow(ctx, getAddressById, id)
 	var i GetAddressByIdRow
 	err := row.Scan(
@@ -74,7 +72,7 @@ func (q *Queries) GetAddressById(ctx context.Context, id string) (GetAddressById
 		&i.Country,
 		&i.AccountsID,
 	)
-	return i, err
+	return &i, err
 }
 
 const isAddressesAlreadyExists = `-- name: IsAddressesAlreadyExists :one
@@ -89,7 +87,7 @@ type IsAddressesAlreadyExistsParams struct {
 	AccountsID string `json:"accounts_id"`
 }
 
-func (q *Queries) IsAddressesAlreadyExists(ctx context.Context, arg IsAddressesAlreadyExistsParams) (bool, error) {
+func (q *Queries) IsAddressesAlreadyExists(ctx context.Context, arg *IsAddressesAlreadyExistsParams) (bool, error) {
 	row := q.db.QueryRow(ctx, isAddressesAlreadyExists, arg.ID, arg.AccountsID)
 	var isAlreadyExists bool
 	err := row.Scan(&isAlreadyExists)
@@ -101,22 +99,22 @@ SELECT id, street_address, city, state_province, postal_code, country, accounts_
 `
 
 type ListAddressesRow struct {
-	ID            string      `json:"id"`
-	StreetAddress pgtype.Text `json:"street_address"`
-	City          string      `json:"city"`
-	StateProvince string      `json:"state_province"`
-	PostalCode    string      `json:"postal_code"`
-	Country       string      `json:"country"`
-	AccountsID    pgtype.Text `json:"accounts_id"`
+	ID            string  `json:"id"`
+	StreetAddress *string `json:"street_address"`
+	City          string  `json:"city"`
+	StateProvince string  `json:"state_province"`
+	PostalCode    string  `json:"postal_code"`
+	Country       string  `json:"country"`
+	AccountsID    *string `json:"accounts_id"`
 }
 
-func (q *Queries) ListAddresses(ctx context.Context) ([]ListAddressesRow, error) {
+func (q *Queries) ListAddresses(ctx context.Context) ([]*ListAddressesRow, error) {
 	rows, err := q.db.Query(ctx, listAddresses)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []ListAddressesRow{}
+	items := []*ListAddressesRow{}
 	for rows.Next() {
 		var i ListAddressesRow
 		if err := rows.Scan(
@@ -130,7 +128,7 @@ func (q *Queries) ListAddresses(ctx context.Context) ([]ListAddressesRow, error)
 		); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, &i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -143,22 +141,22 @@ SELECT id, street_address, city, state_province, postal_code, country, accounts_
 `
 
 type ListAddressesByAccountIdRow struct {
-	ID            string      `json:"id"`
-	StreetAddress pgtype.Text `json:"street_address"`
-	City          string      `json:"city"`
-	StateProvince string      `json:"state_province"`
-	PostalCode    string      `json:"postal_code"`
-	Country       string      `json:"country"`
-	AccountsID    pgtype.Text `json:"accounts_id"`
+	ID            string  `json:"id"`
+	StreetAddress *string `json:"street_address"`
+	City          string  `json:"city"`
+	StateProvince string  `json:"state_province"`
+	PostalCode    string  `json:"postal_code"`
+	Country       string  `json:"country"`
+	AccountsID    *string `json:"accounts_id"`
 }
 
-func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID string) ([]ListAddressesByAccountIdRow, error) {
+func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID string) ([]*ListAddressesByAccountIdRow, error) {
 	rows, err := q.db.Query(ctx, listAddressesByAccountId, accountsID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []ListAddressesByAccountIdRow{}
+	items := []*ListAddressesByAccountIdRow{}
 	for rows.Next() {
 		var i ListAddressesByAccountIdRow
 		if err := rows.Scan(
@@ -172,7 +170,7 @@ func (q *Queries) ListAddressesByAccountId(ctx context.Context, accountsID strin
 		); err != nil {
 			return nil, err
 		}
-		items = append(items, i)
+		items = append(items, &i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -187,16 +185,16 @@ WHERE id = $1 AND accounts_id = $7::text
 `
 
 type UpdateAddressByIdParams struct {
-	ID            string      `json:"id"`
-	StreetAddress pgtype.Text `json:"street_address"`
-	City          string      `json:"city"`
-	StateProvince string      `json:"state_province"`
-	PostalCode    string      `json:"postal_code"`
-	Country       string      `json:"country"`
-	AccountsID    string      `json:"accounts_id"`
+	ID            string  `json:"id"`
+	StreetAddress *string `json:"street_address"`
+	City          string  `json:"city"`
+	StateProvince string  `json:"state_province"`
+	PostalCode    string  `json:"postal_code"`
+	Country       string  `json:"country"`
+	AccountsID    string  `json:"accounts_id"`
 }
 
-func (q *Queries) UpdateAddressById(ctx context.Context, arg UpdateAddressByIdParams) error {
+func (q *Queries) UpdateAddressById(ctx context.Context, arg *UpdateAddressByIdParams) error {
 	_, err := q.db.Exec(ctx, updateAddressById,
 		arg.ID,
 		arg.StreetAddress,

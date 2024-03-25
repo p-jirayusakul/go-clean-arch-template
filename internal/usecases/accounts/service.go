@@ -34,7 +34,7 @@ func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 		Password: hashedPassword,
 	}
 
-	id, err = x.store.CreateAccount(ctx, params)
+	id, err = x.store.CreateAccount(ctx, &params)
 	if err != nil {
 		return
 	}

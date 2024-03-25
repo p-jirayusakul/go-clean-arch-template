@@ -124,7 +124,7 @@ func TestLogin(t *testing.T) {
 			name: "OK",
 			body: `{"email":"test@email.com","password":"123456"}`,
 			buildStubs: func(store *mockup.MockStore, body request.LoginRequest) {
-				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{
+				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(&database.GetAccountByEmailRow{
 					ID:       uid,
 					Email:    body.Email,
 					Password: hashedPassword,
@@ -139,7 +139,7 @@ func TestLogin(t *testing.T) {
 			name: "Unauthorized - username invalid",
 			body: `{"email":"test9999@email.com","password":"123456"}`,
 			buildStubs: func(store *mockup.MockStore, body request.LoginRequest) {
-				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{}, pgx.ErrNoRows)
+				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(&database.GetAccountByEmailRow{}, pgx.ErrNoRows)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.Error(t, err)
@@ -150,7 +150,7 @@ func TestLogin(t *testing.T) {
 			name: "Unauthorized - password invalid",
 			body: `{"email":"test@email.com","password":"123456"}`,
 			buildStubs: func(store *mockup.MockStore, body request.LoginRequest) {
-				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(database.GetAccountByEmailRow{
+				store.EXPECT().GetAccountByEmail(gomock.Any(), body.Email).Times(1).Return(&database.GetAccountByEmailRow{
 					ID:       uid,
 					Email:    body.Email,
 					Password: "password invalid",

@@ -13,18 +13,14 @@ func (x *addressesInteractor) CreateAddresses(addresses entities.AddressesDto) (
 
 	params := database.CreateAddressesParams{
 		City:          addresses.City,
+		StreetAddress: addresses.StreetAddress,
 		StateProvince: addresses.StateProvince,
 		PostalCode:    addresses.PostalCode,
 		Country:       addresses.Country,
 		AccountsID:    addresses.AccountsID,
 	}
 
-	if addresses.StreetAddress != nil {
-		params.StreetAddress.String = *addresses.StreetAddress
-		params.StreetAddress.Valid = true
-	}
-
-	id, err = x.store.CreateAddresses(ctx, params)
+	id, err = x.store.CreateAddresses(ctx, &params)
 	if err != nil {
 		return
 	}
@@ -43,18 +39,12 @@ func (x *addressesInteractor) ListAddressesAddresses(addressesID string) (result
 	for _, data := range r {
 		arg := entities.Addresses{
 			ID:            data.ID,
+			StreetAddress: data.StreetAddress,
 			City:          data.City,
 			StateProvince: data.StateProvince,
 			PostalCode:    data.PostalCode,
 			Country:       data.Country,
-		}
-
-		if data.StreetAddress.Valid {
-			arg.StreetAddress = &data.StreetAddress.String
-		}
-
-		if data.AccountsID.Valid {
-			arg.AccountsID = &data.AccountsID.String
+			AccountsID:    data.AccountsID,
 		}
 
 		result = append(result, arg)
@@ -66,7 +56,7 @@ func (x *addressesInteractor) ListAddressesAddresses(addressesID string) (result
 func (x *addressesInteractor) UpdateAddresses(addresses entities.AddressesDto) (err error) {
 	ctx := context.Background()
 
-	isAlreadyExists, err := x.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+	isAlreadyExists, err := x.store.IsAddressesAlreadyExists(ctx, &database.IsAddressesAlreadyExistsParams{
 		ID:         addresses.ID,
 		AccountsID: addresses.AccountsID,
 	})
@@ -81,6 +71,7 @@ func (x *addressesInteractor) UpdateAddresses(addresses entities.AddressesDto) (
 
 	params := database.UpdateAddressByIdParams{
 		ID:            addresses.ID,
+		StreetAddress: addresses.StreetAddress,
 		City:          addresses.City,
 		StateProvince: addresses.StateProvince,
 		PostalCode:    addresses.PostalCode,
@@ -88,12 +79,7 @@ func (x *addressesInteractor) UpdateAddresses(addresses entities.AddressesDto) (
 		AccountsID:    addresses.AccountsID,
 	}
 
-	if addresses.StreetAddress != nil {
-		params.StreetAddress.String = *addresses.StreetAddress
-		params.StreetAddress.Valid = true
-	}
-
-	err = x.store.UpdateAddressById(ctx, params)
+	err = x.store.UpdateAddressById(ctx, &params)
 	if err != nil {
 		return
 	}
@@ -104,10 +90,11 @@ func (x *addressesInteractor) UpdateAddresses(addresses entities.AddressesDto) (
 func (x *addressesInteractor) DeleteAddresses(addresses entities.AddressesDto) (err error) {
 	ctx := context.Background()
 
-	isAlreadyExists, err := x.store.IsAddressesAlreadyExists(ctx, database.IsAddressesAlreadyExistsParams{
+	params := &database.IsAddressesAlreadyExistsParams{
 		ID:         addresses.ID,
 		AccountsID: addresses.AccountsID,
-	})
+	}
+	isAlreadyExists, err := x.store.IsAddressesAlreadyExists(ctx, params)
 
 	if err != nil {
 		return
