@@ -1,0 +1,326 @@
+definitions:
+  request.CreateAddressesRequest:
+    properties:
+      address:
+        example: 22 Rue du Grenier
+        maxLength: 255
+        type: string
+      city:
+        example: Paris
+        maxLength: 100
+        type: string
+      country:
+        example: France
+        maxLength: 100
+        type: string
+      postalCode:
+        example: "75003"
+        maxLength: 20
+        type: string
+      province:
+        example: Saint-Lazare
+        maxLength: 100
+        type: string
+    required:
+    - city
+    - country
+    - postalCode
+    - province
+    type: object
+  request.LoginRequest:
+    properties:
+      email:
+        example: test@email.com
+        type: string
+      password:
+        example: test123
+        minLength: 6
+        type: string
+    type: object
+  request.RegisterRequest:
+    properties:
+      email:
+        example: test@email.com
+        type: string
+      password:
+        example: test123
+        minLength: 6
+        type: string
+    type: object
+  request.UpdateAddressesRequest:
+    properties:
+      address:
+        example: 22 Rue du Grenier
+        maxLength: 255
+        type: string
+      city:
+        example: Paris
+        maxLength: 100
+        type: string
+      country:
+        example: France
+        maxLength: 100
+        type: string
+      postalCode:
+        example: "75003"
+        maxLength: 20
+        type: string
+      province:
+        example: Saint-Lazare
+        maxLength: 100
+        type: string
+    required:
+    - city
+    - country
+    - postalCode
+    - province
+    type: object
+  response.LoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      message:
+        example: something went wrong
+        type: string
+      status:
+        example: error
+        type: string
+    type: object
+  utils.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        example: do something completed
+        type: string
+      status:
+        example: success
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: This is template clean arch
+  title: Clean Architecture
+  version: "1.0"
+paths:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: register
+      parameters:
+      - description: body request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Login By email and password
+      tags:
+      - auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: register
+      parameters:
+      - description: body request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Register By email and password
+      tags:
+      - auth
+  /api/v1/profile/addresses:
+    get:
+      consumes:
+      - application/json
+      description: list address
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get List Address
+      tags:
+      - profile
+    post:
+      consumes:
+      - application/json
+      description: register
+      parameters:
+      - description: body request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateAddressesRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create Address
+      tags:
+      - profile
+  /api/v1/profile/addresses/{address_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Address
+      parameters:
+      - description: Address ID
+        in: path
+        name: address_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete Address By Address Id
+      tags:
+      - profile
+    put:
+      consumes:
+      - application/json
+      description: update address
+      parameters:
+      - description: Address ID
+        in: path
+        name: address_id
+        required: true
+        type: string
+      - description: body request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateAddressesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update Address
+      tags:
+      - profile
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

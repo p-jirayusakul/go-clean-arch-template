@@ -11,6 +11,10 @@ import (
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/config"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/middleware"
+
+	echoSwagger "github.com/swaggo/echo-swagger"
+
+	_ "github.com/p-jirayusakul/go-clean-arch-template/docs"
 )
 
 type ServerHttpHandler struct {
@@ -38,6 +42,8 @@ func NewServerHttpHandler(
 	}
 
 	var baseAPI = "/api/v1"
+
+	app.GET(baseAPI+"/docs/*", echoSwagger.WrapHandler)
 
 	// auth
 	authGroup := app.Group(baseAPI + "/auth")
