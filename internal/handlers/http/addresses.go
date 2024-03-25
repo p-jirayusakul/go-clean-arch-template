@@ -1,11 +1,13 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http/request"
+	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/utils"
 )
 
@@ -66,7 +68,7 @@ func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 
 	// Response
 	message := "get addresses completed"
-	return utils.RespondWithJSON(c, http.StatusCreated, message, result)
+	return utils.RespondWithJSON(c, http.StatusOK, message, result)
 }
 
 func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
@@ -102,13 +104,16 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 
 	err = s.AddressesUsecase.UpdateAddresses(arg)
 	if err != nil {
+		if errors.Is(err, common.ErrDataNotFound) {
+			return utils.RespondWithError(http.StatusNotFound, err.Error())
+		}
 		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 
 	// Response
 	var payload interface{}
 	message := "update addresses completed"
-	return utils.RespondWithJSON(c, http.StatusCreated, message, payload)
+	return utils.RespondWithJSON(c, http.StatusOK, message, payload)
 }
 
 func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
@@ -139,6 +144,9 @@ func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 
 	err = s.AddressesUsecase.DeleteAddresses(arg)
 	if err != nil {
+		if errors.Is(err, common.ErrDataNotFound) {
+			return utils.RespondWithError(http.StatusNotFound, err.Error())
+		}
 		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
 	}
 

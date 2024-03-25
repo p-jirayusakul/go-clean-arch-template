@@ -1,23 +1,22 @@
 package addresses
 
 import (
-	"github.com/p-jirayusakul/go-clean-arch-template/domain/repositories"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/config"
 )
 
 type addressesInteractor struct {
-	cfg           *config.Config
-	addressesRepo repositories.AddressesRepository
+	cfg       *config.Config
+	dbFactory factories.DBFactory
 }
 
 func NewaddressesInteractor(
 	config *config.Config,
-	dbFactory *factories.DBFactory,
+	dbFactory factories.DBFactory,
 ) *addressesInteractor {
 
 	return &addressesInteractor{
-		cfg:           config,
-		addressesRepo: dbFactory.AddressesRepo,
+		cfg:       config,
+		dbFactory: dbFactory,
 	}
 }

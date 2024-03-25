@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/labstack/echo/v4"
-	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	handlers "github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/config"
@@ -17,12 +16,12 @@ const PATH_CONFIG = ".env"
 
 var (
 	cfg = config.InitConfigs(PATH_CONFIG)
-	db  = database.InitDatabase(cfg)
+	db  = factories.InitDatabase(cfg)
 )
 
-// @title           Flat Architecture
+// @title           Clean Architecture
 // @version         1.0
-// @description     This is template flat arch
+// @description     This is template clean arch
 
 // @securityDefinitions.apikey Bearer
 // @in header

@@ -11,6 +11,6 @@ test:
 	go test ./test
 
 mock:
-	mockgen -package mockup -destination test/mockup/store.go github.com/p-jirayusakul/go-clean-arch-template/database/sqlc Store
+	mockgen -package mockup -destination test/mockup/db.go github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories DBFactory
 
 .PHONY: sqlc server test mock

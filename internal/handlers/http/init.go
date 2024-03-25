@@ -22,9 +22,9 @@ type ServerHttpHandler struct {
 func NewServerHttpHandler(
 	app *echo.Echo,
 	cfg *config.Config,
-	dbFactory *factories.DBFactory,
+	dbFactory factories.DBFactory,
 
-) {
+) *ServerHttpHandler {
 	handler := &ServerHttpHandler{
 		Cfg: cfg,
 		AccountsUsecase: accounts.NewAccountsInteractor(
@@ -51,6 +51,8 @@ func NewServerHttpHandler(
 	addressesGroup.GET("/addresses", handler.ListAddresses)
 	addressesGroup.PUT("/addresses/:id", handler.UpdateAddresses)
 	addressesGroup.DELETE("/addresses/:id", handler.DeleteAddresses)
+
+	return handler
 }
 
 // utils function

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/middleware"
@@ -14,7 +15,7 @@ import (
 func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err error) {
 	ctx := context.Background()
 
-	isEmailAlready, err := x.accountsRepo.IsEmailAlreadyExists(ctx, arg.Email)
+	isEmailAlready, err := x.dbFactory.IsEmailAlreadyExists(ctx, arg.Email)
 	if err != nil {
 		return
 	}
@@ -28,12 +29,12 @@ func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 		return
 	}
 
-	params := entities.AccountsDto{
+	params := database.CreateAccountParams{
 		Email:    arg.Email,
 		Password: hashedPassword,
 	}
 
-	id, err = x.accountsRepo.CraeteAccount(ctx, params)
+	id, err = x.dbFactory.CreateAccount(ctx, params)
 	if err != nil {
 		return
 	}
@@ -44,7 +45,7 @@ func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err error) {
 	ctx := context.Background()
 
-	account, err := x.accountsRepo.GetAccountByEmail(ctx, arg.Email)
+	account, err := x.dbFactory.GetAccountByEmail(ctx, arg.Email)
 	if err != nil {
 		if errors.Is(err, common.ErrDBNoRows) {
 			return "", common.ErrLoginFail
@@ -73,7 +74,7 @@ func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err 
 func (x *accountsInteractor) IsAccountAlreadyExists(arg string) (isAlreadyExists bool, err error) {
 	ctx := context.Background()
 
-	isAlreadyExists, err = x.accountsRepo.IsAccountAlreadyExists(ctx, arg)
+	isAlreadyExists, err = x.dbFactory.IsAccountAlreadyExists(ctx, arg)
 	if err != nil {
 		return
 	}
