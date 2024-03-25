@@ -12,10 +12,10 @@ import (
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/utils"
 )
 
-func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err error) {
+func (s *accountsInteractor) Register(arg entities.AccountsDto) (id string, err error) {
 	ctx := context.Background()
 
-	isEmailAlready, err := x.store.IsEmailAlreadyExists(ctx, arg.Email)
+	isEmailAlready, err := s.store.IsEmailAlreadyExists(ctx, arg.Email)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 		Password: hashedPassword,
 	}
 
-	id, err = x.store.CreateAccount(ctx, &params)
+	id, err = s.store.CreateAccount(ctx, &params)
 	if err != nil {
 		return
 	}
@@ -42,10 +42,10 @@ func (x *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 	return
 }
 
-func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err error) {
+func (s *accountsInteractor) Login(arg entities.AccountsDto) (token string, err error) {
 	ctx := context.Background()
 
-	account, err := x.store.GetAccountByEmail(ctx, arg.Email)
+	account, err := s.store.GetAccountByEmail(ctx, arg.Email)
 	if err != nil {
 		if errors.Is(err, common.ErrDBNoRows) {
 			return "", common.ErrLoginFail
@@ -60,7 +60,7 @@ func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err 
 
 	token, err = middleware.CreateToken(middleware.CreateTokenDTO{
 		UserID:    account.ID,
-		Secret:    x.cfg.JWT_SECRET,
+		Secret:    s.cfg.JWT_SECRET,
 		ExpiresAt: time.Now().Add(time.Hour * 72),
 	})
 
@@ -71,10 +71,10 @@ func (x *accountsInteractor) Login(arg entities.AccountsDto) (token string, err 
 	return
 }
 
-func (x *accountsInteractor) IsAccountAlreadyExists(arg string) (isAlreadyExists bool, err error) {
+func (s *accountsInteractor) IsAccountAlreadyExists(arg string) (isAlreadyExists bool, err error) {
 	ctx := context.Background()
 
-	isAlreadyExists, err = x.store.IsAccountAlreadyExists(ctx, arg)
+	isAlreadyExists, err = s.store.IsAccountAlreadyExists(ctx, arg)
 	if err != nil {
 		return
 	}
