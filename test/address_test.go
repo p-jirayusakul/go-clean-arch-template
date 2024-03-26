@@ -114,6 +114,7 @@ func TestCreateAddress(t *testing.T) {
 			require.NoError(t, err)
 
 			dbFactory := mockup.NewMockStore(ctrl)
+			distributor := mockup.NewMockTaskDistributor(ctrl)
 			tc.buildStubs(dbFactory, dto)
 
 			app := echo.New()
@@ -125,7 +126,7 @@ func TestCreateAddress(t *testing.T) {
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
 			c.Set("accountsID", uid)
-			handler := handlers.NewServerHttpHandler(app, &cfg, dbFactory)
+			handler := handlers.NewServerHttpHandler(app, &cfg, distributor, dbFactory)
 
 			err = handler.CreateAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -184,6 +185,7 @@ func TestListAddresses(t *testing.T) {
 			defer ctrl.Finish()
 
 			dbFactory := mockup.NewMockStore(ctrl)
+			distributor := mockup.NewMockTaskDistributor(ctrl)
 			tc.buildStubs(dbFactory)
 
 			app := echo.New()
@@ -195,7 +197,7 @@ func TestListAddresses(t *testing.T) {
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
 			c.Set("accountsID", uid)
-			handler := handlers.NewServerHttpHandler(app, &cfg, dbFactory)
+			handler := handlers.NewServerHttpHandler(app, &cfg, distributor, dbFactory)
 
 			err := handler.ListAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -276,6 +278,7 @@ func TestSearchAddresses(t *testing.T) {
 			dto.OrderType = "desc"
 
 			dbFactory := mockup.NewMockStore(ctrl)
+			distributor := mockup.NewMockTaskDistributor(ctrl)
 			tc.buildStubs(dbFactory, dto)
 
 			app := echo.New()
@@ -287,7 +290,7 @@ func TestSearchAddresses(t *testing.T) {
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
 			c.Set("accountsID", uid)
-			handler := handlers.NewServerHttpHandler(app, &cfg, dbFactory)
+			handler := handlers.NewServerHttpHandler(app, &cfg, distributor, dbFactory)
 
 			err := handler.SearchAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -411,6 +414,7 @@ func TestUpdateAddresses(t *testing.T) {
 			require.NoError(t, err)
 
 			dbFactory := mockup.NewMockStore(ctrl)
+			distributor := mockup.NewMockTaskDistributor(ctrl)
 			tc.buildStubs(dbFactory, dto)
 
 			app := echo.New()
@@ -425,7 +429,7 @@ func TestUpdateAddresses(t *testing.T) {
 			c.SetPath("/:id")
 			c.SetParamNames("id")
 			c.SetParamValues(addressesID)
-			handler := handlers.NewServerHttpHandler(app, &cfg, dbFactory)
+			handler := handlers.NewServerHttpHandler(app, &cfg, distributor, dbFactory)
 
 			err = handler.UpdateAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
@@ -482,6 +486,7 @@ func TestDeleteAddresses(t *testing.T) {
 			defer ctrl.Finish()
 
 			dbFactory := mockup.NewMockStore(ctrl)
+			distributor := mockup.NewMockTaskDistributor(ctrl)
 			tc.buildStubs(dbFactory)
 
 			app := echo.New()
@@ -496,7 +501,7 @@ func TestDeleteAddresses(t *testing.T) {
 			c.SetPath("/:id")
 			c.SetParamNames("id")
 			c.SetParamValues(addressesID)
-			handler := handlers.NewServerHttpHandler(app, &cfg, dbFactory)
+			handler := handlers.NewServerHttpHandler(app, &cfg, distributor, dbFactory)
 
 			err := handler.DeleteAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)

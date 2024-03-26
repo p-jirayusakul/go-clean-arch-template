@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/p-jirayusakul/go-clean-arch-template/domain/usecases"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/worker"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/usecases/accounts"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/usecases/addresses"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
@@ -19,6 +20,7 @@ import (
 
 type ServerHttpHandler struct {
 	Cfg              *config.Config
+	taskDistributor  worker.TaskDistributor
 	AccountsUsecase  usecases.AccountsUsecase
 	AddressesUsecase usecases.AddressesUsecase
 }
@@ -26,18 +28,22 @@ type ServerHttpHandler struct {
 func NewServerHttpHandler(
 	app *echo.Echo,
 	cfg *config.Config,
+	taskDistributor worker.TaskDistributor,
 	store factories.Store,
 
 ) *ServerHttpHandler {
 	handler := &ServerHttpHandler{
-		Cfg: cfg,
+		Cfg:             cfg,
+		taskDistributor: taskDistributor,
 		AccountsUsecase: accounts.NewAccountsInteractor(
 			cfg,
 			store,
+			taskDistributor,
 		),
 		AddressesUsecase: addresses.NewaddressesInteractor(
 			cfg,
 			store,
+			taskDistributor,
 		),
 	}
 

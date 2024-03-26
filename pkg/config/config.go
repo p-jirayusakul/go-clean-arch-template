@@ -16,6 +16,7 @@ type Config struct {
 	API_PORT          string `mapstructure:"API_PORT"`
 	JWT_SECRET        string `mapstructure:"JWT_SECRET"`
 	SECRET            string `mapstructure:"SECRET"`
+	REDIS_ADDRESS     string `mapstructure:"REDIS_ADDRESS"`
 }
 
 func ConvertInt(env string) int {
@@ -37,6 +38,7 @@ func InitConfigs(filename string) Config {
 		viper.SetDefault("API_PORT", os.Getenv("API_PORT"))
 		viper.SetDefault("JWT_SECRET", os.Getenv("JWT_SECRET"))
 		viper.SetDefault("SECRET", os.Getenv("SECRET"))
+		viper.SetDefault("REDIS_ADDRESS", os.Getenv("REDIS_ADDRESS"))
 	}
 
 	var config Config

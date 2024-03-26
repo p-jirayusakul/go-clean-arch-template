@@ -5,8 +5,10 @@ import (
 	"errors"
 	"time"
 
+	"github.com/hibiken/asynq"
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/worker"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/middleware"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/utils"
@@ -38,6 +40,18 @@ func (s *accountsInteractor) Register(arg entities.AccountsDto) (id string, err 
 	if err != nil {
 		return
 	}
+
+	taskPayload := &worker.PayloadSendVerifyEmail{
+		Email: arg.Email,
+	}
+
+	opts := []asynq.Option{
+		asynq.MaxRetry(10),
+		asynq.ProcessIn(5 * time.Second),
+		asynq.Queue(worker.QueueCritical),
+	}
+
+	s.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
 
 	return
 }
