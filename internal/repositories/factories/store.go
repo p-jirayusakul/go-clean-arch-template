@@ -42,16 +42,18 @@ func InitDatabase(cfg config.Config) *pgxpool.Pool {
 	return conn
 }
 
-func (s *SQLStore) AddCondition(keys map[string]interface{}, args []interface{}) (string, []interface{}) {
+func (s *SQLStore) AddCondition(keys map[string]string, args []interface{}) (string, []interface{}) {
 	var where string
 	for key, value := range keys {
-		args = append(args, value)
-		where = where + fmt.Sprintf("%s%s LIKE '%%' || $%d || '%%'", func() string {
-			if where != "" {
-				return " AND "
-			}
-			return ""
-		}(), key, len(args))
+		if value != "" {
+			args = append(args, value)
+			where = where + fmt.Sprintf("%s%s LIKE '%%' || $%d || '%%'", func() string {
+				if where != "" {
+					return " AND "
+				}
+				return ""
+			}(), key, len(args))
+		}
 	}
 
 	if where != "" {

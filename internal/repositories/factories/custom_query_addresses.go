@@ -49,26 +49,12 @@ func (s *SQLStore) SearchAddresses(ctx context.Context, params SearchAddressesPa
 	args := []interface{}{params.PageSize, params.PageNumber}
 
 	// key คือ column ส่วน value คือค่าที่ได้จาก params
-	keys := make(map[string]interface{})
-
-	if params.City != "" {
-		keys["city"] = params.City
-	}
-
-	if params.StateProvince != "" {
-		keys["state_province"] = params.StateProvince
-	}
-
-	if params.PostalCode != "" {
-		keys["postal_code"] = params.PostalCode
-	}
-
-	if params.Country != "" {
-		keys["country"] = params.Country
-	}
-
-	if params.AccountsID != "" {
-		keys["accounts_id"] = params.AccountsID
+	keys := map[string]string{
+		"city":           params.City,
+		"state_province": params.StateProvince,
+		"postal_code":    params.PostalCode,
+		"country":        params.Country,
+		"accounts_id":    params.AccountsID,
 	}
 
 	where, args = s.AddCondition(keys, args)
