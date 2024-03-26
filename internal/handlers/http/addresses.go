@@ -22,7 +22,7 @@ import (
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/profile/addresses [post]
+// @Router       /api/v1/core/profile/addresses [post]
 // @Security Bearer
 func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 
@@ -75,7 +75,7 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/profile/addresses/me [get]
+// @Router       /api/v1/core/profile/addresses/me [get]
 // @Security Bearer
 func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 
@@ -115,7 +115,7 @@ func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/profile/addresses [get]
+// @Router       /api/v1/core/profile/addresses [get]
 // @Security Bearer
 func (s *ServerHttpHandler) SearchAddresses(c echo.Context) (err error) {
 
@@ -168,7 +168,7 @@ func (s *ServerHttpHandler) SearchAddresses(c echo.Context) (err error) {
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/profile/addresses/{address_id} [put]
+// @Router       /api/v1/core/profile/addresses/{address_id} [put]
 // @Security Bearer
 func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 
@@ -226,7 +226,7 @@ func (s *ServerHttpHandler) UpdateAddresses(c echo.Context) (err error) {
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/profile/addresses/{address_id} [delete]
+// @Router       /api/v1/core/profile/addresses/{address_id} [delete]
 // @Security Bearer
 func (s *ServerHttpHandler) DeleteAddresses(c echo.Context) (err error) {
 

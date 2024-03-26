@@ -23,7 +23,7 @@ import (
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/auth/register [post]
+// @Router       /api/v1/core/auth/register [post]
 func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 
 	// pare json
@@ -68,7 +68,7 @@ func (s *ServerHttpHandler) Register(c echo.Context) (err error) {
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/auth/login [post]
+// @Router       /api/v1/core/auth/login [post]
 func (s *ServerHttpHandler) Login(c echo.Context) (err error) {
 
 	// pare json

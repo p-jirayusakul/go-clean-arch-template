@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/auth/login": {
+        "/api/v1/core/auth/login": {
             "post": {
                 "description": "register",
                 "consumes": [
@@ -79,7 +79,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/register": {
+        "/api/v1/core/auth/register": {
             "post": {
                 "description": "register",
                 "consumes": [
@@ -131,7 +131,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/profile/addresses": {
+        "/api/v1/core/profile/addresses": {
             "get": {
                 "security": [
                     {
@@ -288,7 +288,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/profile/addresses/me": {
+        "/api/v1/core/profile/addresses/me": {
             "get": {
                 "security": [
                     {
@@ -334,7 +334,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/profile/addresses/{address_id}": {
+        "/api/v1/core/profile/addresses/{address_id}": {
             "put": {
                 "security": [
                     {
