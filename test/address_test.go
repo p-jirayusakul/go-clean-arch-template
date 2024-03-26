@@ -12,6 +12,7 @@ import (
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	handlers "github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http/request"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/config"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/middleware"
@@ -205,35 +206,39 @@ func TestListAddresses(t *testing.T) {
 func TestSearchAddresses(t *testing.T) {
 	testCases := []struct {
 		name          string
-		buildStubs    func(store *mockup.MockStore)
+		buildStubs    func(store *mockup.MockStore, body request.SearchAddressesRequest)
 		checkResponse func(t *testing.T, status int, err error)
 	}{
 		{
 			name: "OK",
-			buildStubs: func(store *mockup.MockStore) {
+			buildStubs: func(store *mockup.MockStore, body request.SearchAddressesRequest) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
 
 				var streetAddress *string
 				tmp := "addresses"
 				streetAddress = &tmp
-				store.EXPECT().ListAddressesByAccountId(gomock.Any(), uid).Times(1).Return([]*database.ListAddressesByAccountIdRow{
-					{
-						ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
-						StreetAddress: streetAddress,
-						City:          "city",
-						StateProvince: "provice",
-						PostalCode:    "pastalCode",
-						Country:       "country",
+
+				r := factories.SearchAddressesResult{
+					Data: []factories.SearchAddressesRow{
+						{
+							ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
+							StreetAddress: streetAddress,
+							City:          "city",
+							StateProvince: "provice",
+							PostalCode:    "pastalCode",
+							Country:       "country",
+						},
 					},
-					{
-						ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
-						StreetAddress: streetAddress,
-						City:          "city",
-						StateProvince: "provice",
-						PostalCode:    "pastalCode",
-						Country:       "country",
-					},
-				}, nil)
+					TotalItems: int64(1),
+				}
+
+				store.EXPECT().SearchAddresses(gomock.Any(), factories.SearchAddressesParams{
+					City:       body.City,
+					OrderBy:    body.OrderBy,
+					OrderType:  body.OrderType,
+					PageSize:   10,
+					PageNumber: 0,
+				}).Times(1).Return(&r, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
 				require.NoError(t, err)
@@ -242,7 +247,7 @@ func TestSearchAddresses(t *testing.T) {
 		},
 		{
 			name: "unauthorized - accounts id is invalid",
-			buildStubs: func(store *mockup.MockStore) {
+			buildStubs: func(store *mockup.MockStore, body request.SearchAddressesRequest) {
 				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
 			},
 			checkResponse: func(t *testing.T, status int, err error) {
@@ -260,17 +265,22 @@ func TestSearchAddresses(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			dbFactory := mockup.NewMockStore(ctrl)
-			tc.buildStubs(dbFactory)
-
-			app := echo.New()
-			app.Validator = middleware.NewCustomValidator()
-			app.Use(middleware.ErrorHandler)
-
 			q := make(url.Values)
 			q.Set("city", "city")
 			q.Set("orderBy", "city")
 			q.Set("orderType", "desc")
+
+			var dto request.SearchAddressesRequest
+			dto.City = "city"
+			dto.OrderBy = "city"
+			dto.OrderType = "desc"
+
+			dbFactory := mockup.NewMockStore(ctrl)
+			tc.buildStubs(dbFactory, dto)
+
+			app := echo.New()
+			app.Validator = middleware.NewCustomValidator()
+			app.Use(middleware.ErrorHandler)
 
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/profile/addresses?"+q.Encode(), nil)
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -279,7 +289,7 @@ func TestSearchAddresses(t *testing.T) {
 			c.Set("accountsID", uid)
 			handler := handlers.NewServerHttpHandler(app, &cfg, dbFactory)
 
-			err := handler.ListAddresses(c)
+			err := handler.SearchAddresses(c)
 			tc.checkResponse(t, c.Response().Status, err)
 		})
 	}
