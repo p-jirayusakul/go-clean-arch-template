@@ -184,7 +184,44 @@ paths:
     get:
       consumes:
       - application/json
-      description: list address
+      description: search address
+      parameters:
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: string
+      - description: pageNumber
+        in: query
+        name: pageNumber
+        type: string
+      - description: city
+        in: query
+        name: city
+        type: string
+      - description: province
+        in: query
+        name: province
+        type: string
+      - description: postalCode
+        in: query
+        name: postalCode
+        type: string
+      - description: country
+        in: query
+        name: country
+        type: string
+      - description: accountsID
+        in: query
+        name: accountsID
+        type: string
+      - description: column name
+        in: query
+        name: orderBy
+        type: string
+      - description: e.g desc or asc
+        in: query
+        name: orderType
+        type: string
       produces:
       - application/json
       responses:
@@ -206,7 +243,7 @@ paths:
             $ref: '#/definitions/utils.ErrorResponse'
       security:
       - Bearer: []
-      summary: Get List Address
+      summary: Search List Address
       tags:
       - profile
     post:
@@ -317,6 +354,35 @@ paths:
       security:
       - Bearer: []
       summary: Update Address
+      tags:
+      - profile
+  /api/v1/profile/addresses/me:
+    get:
+      consumes:
+      - application/json
+      description: list address
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get List Address
       tags:
       - profile
 securityDefinitions:

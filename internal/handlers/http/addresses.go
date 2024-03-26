@@ -75,7 +75,7 @@ func (s *ServerHttpHandler) CreateAddresses(c echo.Context) (err error) {
 // @Failure      400  {object}  utils.ErrorResponse
 // @Failure      404  {object}  utils.ErrorResponse
 // @Failure      500  {object}  utils.ErrorResponse
-// @Router       /api/v1/profile/addresses [get]
+// @Router       /api/v1/profile/addresses/me [get]
 // @Security Bearer
 func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 
@@ -92,6 +92,66 @@ func (s *ServerHttpHandler) ListAddresses(c echo.Context) (err error) {
 	}
 
 	// Response
+	message := "get addresses completed"
+	return utils.RespondWithJSON(c, http.StatusOK, message, result)
+}
+
+// Address
+// @Summary      Search List Address
+// @Description  search address
+// @Tags         profile
+// @Accept       json
+// @Produce      json
+// @Param        pageSize    query     string  false  "pageSize"
+// @Param        pageNumber    query     string  false  "pageNumber"
+// @Param        city    query     string  false  "city"
+// @Param        province    query     string  false  "province"
+// @Param        postalCode    query     string  false  "postalCode"
+// @Param        country    query     string  false  "country"
+// @Param        accountsID    query     string  false  "accountsID"
+// @Param        orderBy    query     string  false  "column name"
+// @Param        orderType    query     string  false  "e.g desc or asc"
+// @Success      200  {object}  utils.SuccessResponse
+// @Failure      400  {object}  utils.ErrorResponse
+// @Failure      404  {object}  utils.ErrorResponse
+// @Failure      500  {object}  utils.ErrorResponse
+// @Router       /api/v1/profile/addresses [get]
+// @Security Bearer
+func (s *ServerHttpHandler) SearchAddresses(c echo.Context) (err error) {
+
+	// pare json
+	body := new(request.SearchAddressesRequest)
+	if err := c.Bind(body); err != nil {
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
+	}
+
+	// validate DTO
+	if err = c.Validate(body); err != nil {
+		return utils.RespondWithError(http.StatusBadRequest, err.Error())
+	}
+
+	err = s.GetTokenID(c)
+	if err != nil {
+		return utils.RespondWithError(http.StatusUnauthorized, err.Error())
+	}
+
+	arg := entities.AddressesQueryParams{
+		PageNumber:    body.PageNumber,
+		PageSize:      body.PageSize,
+		City:          body.City,
+		StateProvince: body.Province,
+		PostalCode:    body.PostalCode,
+		Country:       body.Country,
+		AccountsID:    body.AccountsID,
+		OrderBy:       body.OrderBy,
+		OrderType:     body.OrderType,
+	}
+
+	result, err := s.AddressesUsecase.SearchAddresses(arg)
+	if err != nil {
+		return utils.RespondWithError(http.StatusInternalServerError, err.Error())
+	}
+
 	message := "get addresses completed"
 	return utils.RespondWithJSON(c, http.StatusOK, message, result)
 }

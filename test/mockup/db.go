@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
+	factories "github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -231,6 +232,21 @@ func (m *MockStore) ListAddressesByAccountId(arg0 context.Context, arg1 string) 
 func (mr *MockStoreMockRecorder) ListAddressesByAccountId(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAddressesByAccountId", reflect.TypeOf((*MockStore)(nil).ListAddressesByAccountId), arg0, arg1)
+}
+
+// SearchAddresses mocks base method.
+func (m *MockStore) SearchAddresses(arg0 context.Context, arg1 factories.SearchAddressesParams) (*factories.SearchAddressesResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SearchAddresses", arg0, arg1)
+	ret0, _ := ret[0].(*factories.SearchAddressesResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SearchAddresses indicates an expected call of SearchAddresses.
+func (mr *MockStoreMockRecorder) SearchAddresses(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchAddresses", reflect.TypeOf((*MockStore)(nil).SearchAddresses), arg0, arg1)
 }
 
 // UpdateAccountPasswordByEmail mocks base method.

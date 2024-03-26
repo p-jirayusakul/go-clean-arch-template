@@ -19,3 +19,23 @@ type AddressesDto struct {
 	Country       string  `json:"country"`
 	AccountsID    string  `json:"accounts_id"`
 }
+
+type AddressesQueryParams struct {
+	PageNumber    int
+	PageSize      int
+	City          string
+	StateProvince string
+	PostalCode    string
+	Country       string
+	AccountsID    string
+	OrderBy       string
+	OrderType     string
+}
+
+type AddressesQueryResult struct {
+	Data       []Addresses `json:"data"`
+	TotalItems int         `json:"totalItems"`
+	TotalPages int         `json:"totalPages"`
+	PageNumber int         `json:"pageNumber"`
+	PageSize   int         `json:"pageSize"`
+}

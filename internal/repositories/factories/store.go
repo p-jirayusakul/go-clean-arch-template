@@ -13,6 +13,7 @@ import (
 // Store defines all functions to execute db queries and transactions
 type Store interface {
 	database.Querier
+	SearchAddresses(ctx context.Context, params SearchAddressesParams) (*SearchAddressesResult, error)
 }
 
 // SQLStore provides all functions to execute SQL queries and transactions
@@ -39,4 +40,23 @@ func InitDatabase(cfg config.Config) *pgxpool.Pool {
 		os.Exit(1)
 	}
 	return conn
+}
+
+func (s *SQLStore) AddCondition(keys map[string]interface{}, args []interface{}) (string, []interface{}) {
+	var where string
+	for key, value := range keys {
+		args = append(args, value)
+		where = where + fmt.Sprintf("%s%s LIKE '%%' || $%d || '%%'", func() string {
+			if where != "" {
+				return " AND "
+			}
+			return ""
+		}(), key, len(args))
+	}
+
+	if where != "" {
+		where = " WHERE " + where
+	}
+
+	return where, args
 }

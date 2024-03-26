@@ -52,7 +52,8 @@ func NewServerHttpHandler(
 	addressesGroup := app.Group(common.BASE_URL + "/profile")
 	addressesGroup.Use(middleware.ConfigJWT(cfg.JWT_SECRET))
 	addressesGroup.POST("/addresses", handler.CreateAddresses)
-	addressesGroup.GET("/addresses", handler.ListAddresses)
+	addressesGroup.GET("/addresses/me", handler.ListAddresses)
+	addressesGroup.GET("/addresses", handler.SearchAddresses)
 	addressesGroup.PUT("/addresses/:id", handler.UpdateAddresses)
 	addressesGroup.DELETE("/addresses/:id", handler.DeleteAddresses)
 

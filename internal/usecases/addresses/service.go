@@ -2,9 +2,11 @@ package addresses
 
 import (
 	"context"
+	"math"
 
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 )
 
@@ -49,6 +51,80 @@ func (s *addressesInteractor) ListAddressesAddresses(addressesID string) (result
 
 		result = append(result, arg)
 	}
+
+	return
+}
+
+func (s *addressesInteractor) SearchAddresses(addressesQuery entities.AddressesQueryParams) (result entities.AddressesQueryResult, err error) {
+	ctx := context.Background()
+
+	pageNumber := addressesQuery.PageNumber
+	pageSize := addressesQuery.PageSize
+
+	if addressesQuery.PageSize == 0 {
+		pageSize = common.PAGE_SIZE
+	}
+
+	if pageSize > common.MAX_PAGE_SIZE {
+		pageSize = common.MAX_PAGE_SIZE
+	}
+
+	if pageNumber > 0 {
+		pageNumber = (pageNumber - 1) * pageSize
+	}
+
+	arg := factories.SearchAddressesParams{
+		PageNumber:    pageNumber,
+		PageSize:      pageSize,
+		City:          addressesQuery.City,
+		PostalCode:    addressesQuery.PostalCode,
+		StateProvince: addressesQuery.StateProvince,
+		Country:       addressesQuery.Country,
+		AccountsID:    addressesQuery.AccountsID,
+		OrderBy:       addressesQuery.OrderBy,
+		OrderType:     addressesQuery.OrderType,
+	}
+
+	r, err := s.store.SearchAddresses(ctx, arg)
+	if err != nil {
+		return
+	}
+
+	var listAddresses []entities.Addresses
+	for _, data := range r.Data {
+		arg := entities.Addresses{
+			ID:            data.ID,
+			StreetAddress: data.StreetAddress,
+			City:          data.City,
+			StateProvince: data.StateProvince,
+			PostalCode:    data.PostalCode,
+			Country:       data.Country,
+			AccountsID:    data.AccountsID,
+		}
+
+		listAddresses = append(listAddresses, arg)
+	}
+
+	// convert some data before response
+	result.Data = listAddresses
+	var totalPages int
+	if len(listAddresses) > 0 {
+		result.TotalItems = int(r.TotalItems)
+		totalPages = int(math.Ceil(float64(r.TotalItems) / float64(pageSize)))
+	} else {
+		result.TotalItems = 0
+		totalPages = 0
+	}
+
+	if addressesQuery.PageNumber == 0 {
+		pageNumber = 1
+	} else {
+		pageNumber = addressesQuery.PageNumber
+	}
+
+	result.PageNumber = pageNumber
+	result.PageSize = pageSize
+	result.TotalPages = totalPages
 
 	return
 }
