@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -188,7 +189,90 @@ func TestListAddresses(t *testing.T) {
 			app.Validator = middleware.NewCustomValidator()
 			app.Use(middleware.ErrorHandler)
 
-			req := httptest.NewRequest(http.MethodGet, "/api/v1/profile/addresses", nil)
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/profile/addresses/me", nil)
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			rec := httptest.NewRecorder()
+			c := app.NewContext(req, rec)
+			c.Set("accountsID", uid)
+			handler := handlers.NewServerHttpHandler(app, &cfg, dbFactory)
+
+			err := handler.ListAddresses(c)
+			tc.checkResponse(t, c.Response().Status, err)
+		})
+	}
+}
+
+func TestSearchAddresses(t *testing.T) {
+	testCases := []struct {
+		name          string
+		buildStubs    func(store *mockup.MockStore)
+		checkResponse func(t *testing.T, status int, err error)
+	}{
+		{
+			name: "OK",
+			buildStubs: func(store *mockup.MockStore) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(true, nil)
+
+				var streetAddress *string
+				tmp := "addresses"
+				streetAddress = &tmp
+				store.EXPECT().ListAddressesByAccountId(gomock.Any(), uid).Times(1).Return([]*database.ListAddressesByAccountIdRow{
+					{
+						ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
+						StreetAddress: streetAddress,
+						City:          "city",
+						StateProvince: "provice",
+						PostalCode:    "pastalCode",
+						Country:       "country",
+					},
+					{
+						ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
+						StreetAddress: streetAddress,
+						City:          "city",
+						StateProvince: "provice",
+						PostalCode:    "pastalCode",
+						Country:       "country",
+					},
+				}, nil)
+			},
+			checkResponse: func(t *testing.T, status int, err error) {
+				require.NoError(t, err)
+				require.Equal(t, http.StatusOK, status)
+			},
+		},
+		{
+			name: "unauthorized - accounts id is invalid",
+			buildStubs: func(store *mockup.MockStore) {
+				store.EXPECT().IsAccountAlreadyExists(gomock.Any(), uid).Times(1).Return(false, nil)
+			},
+			checkResponse: func(t *testing.T, status int, err error) {
+				require.Error(t, err)
+				require.Equal(t, utils.ReplaceStringError(http.StatusUnauthorized, err.Error()), common.ErrAccountIsInvalid.Error())
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := config.InitConfigs(".env")
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			dbFactory := mockup.NewMockStore(ctrl)
+			tc.buildStubs(dbFactory)
+
+			app := echo.New()
+			app.Validator = middleware.NewCustomValidator()
+			app.Use(middleware.ErrorHandler)
+
+			q := make(url.Values)
+			q.Set("city", "city")
+			q.Set("orderBy", "city")
+			q.Set("orderType", "desc")
+
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/profile/addresses?"+q.Encode(), nil)
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			c := app.NewContext(req, rec)
