@@ -13,7 +13,7 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
 	handlers "github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http"
-	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/db"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/worker"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/config"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/middleware"
@@ -29,8 +29,8 @@ var interruptSignals = []os.Signal{
 }
 
 var (
-	cfg = config.InitConfigs(PATH_CONFIG)
-	db  = factories.InitDatabase(cfg)
+	cfg    = config.InitConfigs(PATH_CONFIG)
+	dbConn = db.InitDatabase(cfg)
 )
 
 // @title           Clean Architecture
@@ -49,7 +49,7 @@ func main() {
 	defer stop()
 
 	// plug database
-	store := factories.NewStore(db)
+	store := db.NewStore(dbConn)
 
 	redisOpt := asynq.RedisClientOpt{
 		Addr: cfg.REDIS_ADDRESS,
@@ -90,7 +90,7 @@ func runTaskProcessor(
 	ctx context.Context,
 	waitGroup *errgroup.Group,
 	redisOpt asynq.RedisClientOpt,
-	store factories.Store,
+	store db.Store,
 ) {
 	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
 
