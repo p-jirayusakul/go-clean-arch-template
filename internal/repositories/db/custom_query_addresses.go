@@ -1,4 +1,4 @@
-package factories
+package db
 
 import (
 	"context"

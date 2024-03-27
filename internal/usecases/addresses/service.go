@@ -6,7 +6,7 @@ import (
 
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
-	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/db"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 )
 
@@ -73,7 +73,7 @@ func (s *addressesInteractor) SearchAddresses(addressesQuery entities.AddressesQ
 		pageNumber = (pageNumber - 1) * pageSize
 	}
 
-	arg := factories.SearchAddressesParams{
+	arg := db.SearchAddressesParams{
 		PageNumber:    pageNumber,
 		PageSize:      pageSize,
 		City:          addressesQuery.City,

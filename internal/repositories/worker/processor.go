@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/hibiken/asynq"
-	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/db"
 )
 
 const (
@@ -22,10 +22,10 @@ type TaskProcessor interface {
 
 type RedisTaskProcessor struct {
 	server *asynq.Server
-	store  factories.Store
+	store  db.Store
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store factories.Store) TaskProcessor {
+func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskProcessor {
 
 	server := asynq.NewServer(
 		redisOpt,

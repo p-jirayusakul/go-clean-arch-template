@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/p-jirayusakul/go-clean-arch-template/domain/usecases"
-	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/db"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/worker"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/usecases/accounts"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/usecases/addresses"
@@ -29,7 +29,7 @@ func NewServerHttpHandler(
 	app *echo.Echo,
 	cfg *config.Config,
 	taskDistributor worker.TaskDistributor,
-	store factories.Store,
+	store db.Store,
 
 ) *ServerHttpHandler {
 	handler := &ServerHttpHandler{

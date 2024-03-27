@@ -12,7 +12,7 @@ import (
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
 	handlers "github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http/request"
-	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/factories"
+	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/db"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/common"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/config"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/middleware"
@@ -220,8 +220,8 @@ func TestSearchAddresses(t *testing.T) {
 				tmp := "addresses"
 				streetAddress = &tmp
 
-				r := factories.SearchAddressesResult{
-					Data: []factories.SearchAddressesRow{
+				r := db.SearchAddressesResult{
+					Data: []db.SearchAddressesRow{
 						{
 							ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
 							StreetAddress: streetAddress,
@@ -234,7 +234,7 @@ func TestSearchAddresses(t *testing.T) {
 					TotalItems: int64(1),
 				}
 
-				store.EXPECT().SearchAddresses(gomock.Any(), factories.SearchAddressesParams{
+				store.EXPECT().SearchAddresses(gomock.Any(), db.SearchAddressesParams{
 					City:       body.City,
 					OrderBy:    body.OrderBy,
 					OrderType:  body.OrderType,
