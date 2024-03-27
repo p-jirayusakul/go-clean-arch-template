@@ -7,13 +7,14 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
+	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
 	"github.com/p-jirayusakul/go-clean-arch-template/pkg/config"
 )
 
 // Store defines all functions to execute db queries and transactions
 type Store interface {
 	database.Querier
-	SearchAddresses(ctx context.Context, params SearchAddressesParams) (*SearchAddressesResult, error)
+	SearchAddresses(ctx context.Context, params SearchAddressesParams) (*entities.AddressesQueryResult, error)
 }
 
 // SQLStore provides all functions to execute SQL queries and transactions

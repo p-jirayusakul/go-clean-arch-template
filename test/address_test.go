@@ -10,6 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
+	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
 	handlers "github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/handlers/http/request"
 	"github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/db"
@@ -220,8 +221,8 @@ func TestSearchAddresses(t *testing.T) {
 				tmp := "addresses"
 				streetAddress = &tmp
 
-				r := db.SearchAddressesResult{
-					Data: []db.SearchAddressesRow{
+				r := entities.AddressesQueryResult{
+					Data: []entities.Addresses{
 						{
 							ID:            "942524af-9df4-425a-8abc-77e940ef8fcb",
 							StreetAddress: streetAddress,
@@ -231,7 +232,7 @@ func TestSearchAddresses(t *testing.T) {
 							Country:       "country",
 						},
 					},
-					TotalItems: int64(1),
+					TotalItems: int(1),
 				}
 
 				store.EXPECT().SearchAddresses(gomock.Any(), db.SearchAddressesParams{

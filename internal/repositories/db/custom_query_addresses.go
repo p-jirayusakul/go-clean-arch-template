@@ -3,22 +3,9 @@ package db
 import (
 	"context"
 	"fmt"
+
+	"github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
 )
-
-type SearchAddressesRow struct {
-	ID            string  `json:"id"`
-	StreetAddress *string `json:"street_address"`
-	City          string  `json:"city"`
-	StateProvince string  `json:"state_province"`
-	PostalCode    string  `json:"postal_code"`
-	Country       string  `json:"country"`
-	AccountsID    *string `json:"accounts_id"`
-}
-
-type SearchAddressesResult struct {
-	Data       []SearchAddressesRow `json:"data"`
-	TotalItems int64                `json:"totalItems"`
-}
 
 type SearchAddressesParams struct {
 	PageNumber    int
@@ -32,7 +19,7 @@ type SearchAddressesParams struct {
 	OrderType     string
 }
 
-func (s *SQLStore) SearchAddresses(ctx context.Context, params SearchAddressesParams) (*SearchAddressesResult, error) {
+func (s *SQLStore) SearchAddresses(ctx context.Context, params SearchAddressesParams) (*entities.AddressesQueryResult, error) {
 
 	var where string
 	order := params.OrderBy
@@ -65,9 +52,9 @@ func (s *SQLStore) SearchAddresses(ctx context.Context, params SearchAddressesPa
 		return nil, err
 	}
 	defer rows.Close()
-	items := []SearchAddressesRow{}
+	items := []entities.Addresses{}
 	for rows.Next() {
-		var i SearchAddressesRow
+		var i entities.Addresses
 		if err := rows.Scan(
 			&i.ID,
 			&i.StreetAddress,
@@ -96,8 +83,8 @@ func (s *SQLStore) SearchAddresses(ctx context.Context, params SearchAddressesPa
 		}
 	}
 
-	return &SearchAddressesResult{
+	return &entities.AddressesQueryResult{
 		Data:       items,
-		TotalItems: totalItems,
+		TotalItems: int(totalItems),
 	}, nil
 }

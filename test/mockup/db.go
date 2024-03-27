@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	database "github.com/p-jirayusakul/go-clean-arch-template/database/sqlc"
+	entities "github.com/p-jirayusakul/go-clean-arch-template/domain/entities"
 	db "github.com/p-jirayusakul/go-clean-arch-template/internal/repositories/db"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -235,10 +236,10 @@ func (mr *MockStoreMockRecorder) ListAddressesByAccountId(arg0, arg1 any) *gomoc
 }
 
 // SearchAddresses mocks base method.
-func (m *MockStore) SearchAddresses(arg0 context.Context, arg1 db.SearchAddressesParams) (*db.SearchAddressesResult, error) {
+func (m *MockStore) SearchAddresses(arg0 context.Context, arg1 db.SearchAddressesParams) (*entities.AddressesQueryResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchAddresses", arg0, arg1)
-	ret0, _ := ret[0].(*db.SearchAddressesResult)
+	ret0, _ := ret[0].(*entities.AddressesQueryResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

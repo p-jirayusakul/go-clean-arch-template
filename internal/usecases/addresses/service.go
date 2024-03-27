@@ -55,7 +55,7 @@ func (s *addressesInteractor) ListAddressesAddresses(addressesID string) (result
 	return
 }
 
-func (s *addressesInteractor) SearchAddresses(addressesQuery entities.AddressesQueryParams) (result entities.AddressesQueryResult, err error) {
+func (s *addressesInteractor) SearchAddresses(addressesQuery entities.AddressesQueryParams) (result *entities.AddressesQueryResult, err error) {
 	ctx := context.Background()
 
 	pageNumber := addressesQuery.PageNumber
@@ -85,32 +85,16 @@ func (s *addressesInteractor) SearchAddresses(addressesQuery entities.AddressesQ
 		OrderType:     addressesQuery.OrderType,
 	}
 
-	r, err := s.store.SearchAddresses(ctx, arg)
+	result, err = s.store.SearchAddresses(ctx, arg)
 	if err != nil {
 		return
 	}
 
-	var listAddresses []entities.Addresses
-	for _, data := range r.Data {
-		arg := entities.Addresses{
-			ID:            data.ID,
-			StreetAddress: data.StreetAddress,
-			City:          data.City,
-			StateProvince: data.StateProvince,
-			PostalCode:    data.PostalCode,
-			Country:       data.Country,
-			AccountsID:    data.AccountsID,
-		}
-
-		listAddresses = append(listAddresses, arg)
-	}
-
 	// convert some data before response
-	result.Data = listAddresses
 	var totalPages int
-	if len(listAddresses) > 0 {
-		result.TotalItems = int(r.TotalItems)
-		totalPages = int(math.Ceil(float64(r.TotalItems) / float64(pageSize)))
+	if len(result.Data) > 0 {
+		result.TotalItems = int(result.TotalItems)
+		totalPages = int(math.Ceil(float64(result.TotalItems) / float64(pageSize)))
 	} else {
 		result.TotalItems = 0
 		totalPages = 0
